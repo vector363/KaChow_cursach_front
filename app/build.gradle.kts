@@ -41,6 +41,7 @@ android {
 
 dependencies {
     implementation("androidx.navigation:navigation-compose:2.8.9") // Navigation
+    implementation("androidx.core:core-splashscreen:1.0.1") //Экран-заставка
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
