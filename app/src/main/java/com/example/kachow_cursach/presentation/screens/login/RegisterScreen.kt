@@ -13,39 +13,43 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.sp
-import com.example.kachow_cursach.R
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.sp
+import com.example.kachow_cursach.R
 import com.example.kachow_cursach.domain.validation.ValidationUtils
 
 
 @Composable
-fun LoginScreen(navController: NavController){
+fun RegisterScreen(navController: NavController){
+    var passwordVisible by remember { mutableStateOf(false) }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
+    var repeatPassword by remember { mutableStateOf("") }
 
     // Валидация
     var showError by remember { mutableStateOf(false) }
     val isEmailValid = ValidationUtils.isValidEmail(email)
     val isPasswordValid = ValidationUtils.isValidPassword(password)
-    val isFormValid = isEmailValid && isPasswordValid
+    val doPasswordsMatch = ValidationUtils.doPasswordsMatch(password, repeatPassword)
+    val isFormValid = isEmailValid && isPasswordValid && doPasswordsMatch &&
+            password.isNotEmpty() && repeatPassword.isNotEmpty()
+
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -76,7 +80,7 @@ fun LoginScreen(navController: NavController){
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "Добро пожаловать",
+                    text = "Регистрация",
                     fontSize = (35.sp),
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onSurface
@@ -86,11 +90,8 @@ fun LoginScreen(navController: NavController){
 
                 TextField(
                     value = email,
-                    onValueChange = {
-                        email = it
-                        showError = false
-                    },
-                    label = { Text("Email") },
+                    onValueChange = {email = it},
+                    label = { Text("Введите email") },
                     textStyle = LocalTextStyle.current.copy(
                         fontSize = 18.sp,
                         lineHeight = 28.sp
@@ -134,7 +135,7 @@ fun LoginScreen(navController: NavController){
                         password = it
                         showError = false
                     },
-                    label = { Text("Пароль") },
+                    label = { Text("Введите пароль") },
                     textStyle = LocalTextStyle.current.copy(
                         fontSize = 18.sp,
                         lineHeight = 28.sp
@@ -170,9 +171,55 @@ fun LoginScreen(navController: NavController){
                             )
                         }
                     },
+                    visualTransformation = PasswordVisualTransformation()
+                )
+
+                // Повтор пароля
+                TextField(
+                    value = repeatPassword,
+                    onValueChange = {
+                        repeatPassword = it
+                        showError = false
+                    },
+                    label = { Text("Повторите пароль") },
+                    textStyle = LocalTextStyle.current.copy(
+                        fontSize = 18.sp,
+                        lineHeight = 28.sp
+                    ),
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .fillMaxWidth(),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                        unfocusedIndicatorColor = if (repeatPassword.isNotEmpty() && !doPasswordsMatch)
+                            MaterialTheme.colorScheme.error
+                        else
+                            MaterialTheme.colorScheme.primary,
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        focusedLabelColor = MaterialTheme.colorScheme.primary,
+                        unfocusedLabelColor = if (repeatPassword.isNotEmpty() && !doPasswordsMatch)
+                            MaterialTheme.colorScheme.error
+                        else
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                    ),
+                    singleLine = true,
+                    isError = repeatPassword.isNotEmpty() && !doPasswordsMatch,
+                    supportingText = {
+                        if (repeatPassword.isNotEmpty() && !doPasswordsMatch) {
+                            Text(
+                                text = "Пароли не совпадают",
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    },
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
-                        if (password.isNotEmpty()) {
+                        if (repeatPassword.isNotEmpty()) {
                             IconButton(
                                 onClick = { passwordVisible = !passwordVisible }
                             ) {
@@ -192,16 +239,22 @@ fun LoginScreen(navController: NavController){
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Button(
-                    onClick = {},
+                    onClick = {
+                        if (isFormValid) {
+                            showError = false
+                        } else {
+                            showError = true
+                        }
+                    },
                     modifier = Modifier
-                        .width(220.dp)
+                        .width(290.dp)
                         .height(53.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
                     Text(
-                        text = "Войти",
+                        text = "Зарегистрироваться",
                         fontSize = 24.sp,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
@@ -209,7 +262,7 @@ fun LoginScreen(navController: NavController){
 
                 if (showError) {
                     Text(
-                        text = "Неверный email или пароль",
+                        text = "Заполните все поля корректно",
                         color = MaterialTheme.colorScheme.error,
                         fontSize = 14.sp
                     )
@@ -222,23 +275,23 @@ fun LoginScreen(navController: NavController){
                 )
 
                 Text(
-                    text = "Нету аккаунта?",
+                    text = "Уже есть аккаунт?",
                     fontSize = 12.sp,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Button(
-                    onClick = { navController.navigate("register")},
+                    onClick = {navController.navigate("login")},
                     modifier = Modifier
-                        .width(220.dp)
+                        .width(250.dp)
                         .height(45.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer
                     )
                 ) {
                     Text(
-                        text = "Регистрация",
+                        text = "Войти в аккаунт",
                         fontSize = 24.sp,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
@@ -247,29 +300,3 @@ fun LoginScreen(navController: NavController){
         }
     }
 }
-
-
-
-//                Card(
-//                    modifier = Modifier.wrapContentWidth(),
-//                    colors = CardDefaults.cardColors(
-//                        containerColor = MaterialTheme.colorScheme.primaryContainer
-//                    )
-//                ) {
-//                    Text(
-//                        text = "Добро пожаловать",
-//                        modifier = Modifier.padding(16.dp),
-//                        color = MaterialTheme.colorScheme.onPrimaryContainer
-//                    )
-//                }
-
-//            OutlinedTextField(
-//                value = "",
-//                onValueChange = {},
-//                label = { Text("Пример поля ввода") },
-//                modifier = Modifier.fillMaxWidth(),
-//                colors = OutlinedTextFieldDefaults.colors(
-//                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-//                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
-//                )
-//            )
