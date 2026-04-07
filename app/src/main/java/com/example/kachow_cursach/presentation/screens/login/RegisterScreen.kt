@@ -33,6 +33,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.sp
 import com.example.kachow_cursach.R
 import com.example.kachow_cursach.domain.validation.ValidationUtils
+import com.example.kachow_cursach.presentation.components.CustomSnackbar
 
 
 @Composable
@@ -49,6 +50,9 @@ fun RegisterScreen(navController: NavController){
     val doPasswordsMatch = ValidationUtils.doPasswordsMatch(password, repeatPassword)
     val isFormValid = isEmailValid && isPasswordValid && doPasswordsMatch &&
             password.isNotEmpty() && repeatPassword.isNotEmpty()
+
+    //диалог
+    var showSuccessDialog by remember { mutableStateOf(false) }
 
 
     Box(
@@ -174,7 +178,6 @@ fun RegisterScreen(navController: NavController){
                     visualTransformation = PasswordVisualTransformation()
                 )
 
-                // Повтор пароля
                 TextField(
                     value = repeatPassword,
                     onValueChange = {
@@ -240,8 +243,11 @@ fun RegisterScreen(navController: NavController){
 
                 Button(
                     onClick = {
+                        showSuccessDialog = true
+
                         if (isFormValid) {
                             showError = false
+                            showSuccessDialog = true
                         } else {
                             showError = true
                         }
@@ -294,6 +300,19 @@ fun RegisterScreen(navController: NavController){
                         text = "Войти в аккаунт",
                         fontSize = 24.sp,
                         color = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+
+                if (showSuccessDialog) {
+                    CustomSnackbar(
+                        message = "Аккаунт успешно создан!",
+                        isSuccess = true,
+                        onDismiss = {
+                            showSuccessDialog = false
+                            navController.navigate("login") {
+                                popUpTo("register") { inclusive = true }
+                            }
+                        }
                     )
                 }
             }

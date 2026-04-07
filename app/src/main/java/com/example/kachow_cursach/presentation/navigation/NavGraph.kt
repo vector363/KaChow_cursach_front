@@ -6,6 +6,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.kachow_cursach.presentation.screens.login.LoginScreen
 import com.example.kachow_cursach.presentation.screens.login.RegisterScreen
+import com.example.kachow_cursach.presentation.screens.main.CatalogScreen
+import com.example.kachow_cursach.presentation.screens.main.MainScreen
 
 
 @Composable
@@ -21,6 +23,12 @@ fun NavGraph() {
         }
         composable("register") {
             RegisterScreen(navController)
+        }
+        composable("catalog") {
+            CatalogScreen(navController)
+        }
+        composable("main") {
+            MainScreen(navController)
         }
     }
 }

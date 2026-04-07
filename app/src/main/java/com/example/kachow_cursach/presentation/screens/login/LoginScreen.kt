@@ -192,7 +192,7 @@ fun LoginScreen(navController: NavController){
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Button(
-                    onClick = {},
+                    onClick = {navController.navigate("main")},
                     modifier = Modifier
                         .width(220.dp)
                         .height(53.dp),
@@ -247,29 +247,3 @@ fun LoginScreen(navController: NavController){
         }
     }
 }
-
-
-
-//                Card(
-//                    modifier = Modifier.wrapContentWidth(),
-//                    colors = CardDefaults.cardColors(
-//                        containerColor = MaterialTheme.colorScheme.primaryContainer
-//                    )
-//                ) {
-//                    Text(
-//                        text = "Добро пожаловать",
-//                        modifier = Modifier.padding(16.dp),
-//                        color = MaterialTheme.colorScheme.onPrimaryContainer
-//                    )
-//                }
-
-//            OutlinedTextField(
-//                value = "",
-//                onValueChange = {},
-//                label = { Text("Пример поля ввода") },
-//                modifier = Modifier.fillMaxWidth(),
-//                colors = OutlinedTextFieldDefaults.colors(
-//                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-//                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
-//                )
-//            )
