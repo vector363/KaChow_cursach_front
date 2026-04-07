@@ -1,10 +1,8 @@
 package com.example.kachow_cursach.presentation.components
 
-import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -58,7 +56,7 @@ fun CustomSnackbar(
             ) {
 
                 Icon(
-                    painter = painterResource(id = R.drawable.icon_account),
+                    painter = painterResource(id = R.drawable.icon_profile_switch),
                     contentDescription = "аккаунт уcпешно создан",
                     tint = Color.White,
                     modifier = Modifier.size(100.dp)

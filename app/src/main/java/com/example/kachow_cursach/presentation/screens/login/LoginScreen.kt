@@ -79,7 +79,7 @@ fun LoginScreen(navController: NavController){
                     text = "Добро пожаловать",
                     fontSize = (35.sp),
                     style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
 
                 Spacer(modifier = Modifier.height(15.dp))
