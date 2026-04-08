@@ -43,7 +43,7 @@ sealed class BottomNavItem(
 
 @Composable
 fun MainScreen(navController: NavController) {
-    var selectedItem by remember { mutableStateOf<BottomNavItem>(BottomNavItem.Catalog) }
+    var selectedItem by remember { mutableStateOf<BottomNavItem>(BottomNavItem.Favorites) }
 
     Box(
         modifier = Modifier.fillMaxSize()
