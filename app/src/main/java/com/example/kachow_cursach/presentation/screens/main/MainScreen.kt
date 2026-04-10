@@ -43,10 +43,13 @@ sealed class BottomNavItem(
 
 @Composable
 fun MainScreen(navController: NavController) {
-    var selectedItem by remember { mutableStateOf<BottomNavItem>(BottomNavItem.Favorites) }
+    var selectedItem by remember { mutableStateOf<BottomNavItem>(BottomNavItem.Catalog) }
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .padding(top = 14.dp)
+            .fillMaxSize()
+
     ) {
         when (selectedItem) {
             BottomNavItem.Catalog -> CatalogScreen(navController)

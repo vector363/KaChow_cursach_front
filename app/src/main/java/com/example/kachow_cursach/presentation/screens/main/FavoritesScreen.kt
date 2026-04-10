@@ -66,34 +66,32 @@ fun FavoritesScreen(navController: NavController) {
         },
     ) { paddingValues ->
         if (favoriteCars.isEmpty()) {
-            if (favoriteCars.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            modifier = Modifier.size(80.dp),
-                            painter = painterResource(
-                                id = R.drawable.icon_favorite_switch
-                            ),
-                            contentDescription = "Избранное",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Text(
-                            text = "Нет избранных автомобилей",
-                            fontSize = 18.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Text(
-                            text = "Добавьте машины через сердечко",
-                            fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    Icon(
+                        modifier = Modifier.size(80.dp),
+                        painter = painterResource(
+                            id = R.drawable.icon_favorite_switch
+                        ),
+                        contentDescription = "Избранное",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = "Нет избранных автомобилей",
+                        fontSize = 18.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "Добавьте машины через сердечко",
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
         } else {

@@ -143,7 +143,6 @@ fun CarItem(
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1
                     )
-
                 }
             }
         }

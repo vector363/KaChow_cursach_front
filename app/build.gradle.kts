@@ -42,6 +42,8 @@ android {
 dependencies {
     implementation("androidx.navigation:navigation-compose:2.8.9") // Navigation
     implementation("androidx.core:core-splashscreen:1.0.1") //Экран-заставка
+    implementation("io.coil-kt:coil-compose:2.6.0")// фото в полноэкранном режиме
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

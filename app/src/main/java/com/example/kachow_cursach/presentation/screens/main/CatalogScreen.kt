@@ -34,7 +34,7 @@ fun CatalogScreen(navController: NavController) {
             id = 1,
             brand = "BMW",
             model = "E60",
-            price = 25000,
+            price = 1000000,
             year = "2023",
             mileage = 5000,
             imageRes = R.drawable.e60_image,
@@ -161,7 +161,7 @@ fun CatalogScreen(navController: NavController) {
                 CarItem(
                     car = car,
                     onClick = {
-                        // переход на детальный экран
+                        navController.navigate("car_detail/${car.id}")
                     },
                     onFavoriteClick = {
                         // обновление избранного
