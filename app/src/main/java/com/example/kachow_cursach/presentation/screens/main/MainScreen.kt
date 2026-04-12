@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.kachow_cursach.R
+import com.example.kachow_cursach.domain.model.Dealership
 
 
 sealed class BottomNavItem(
@@ -41,9 +42,14 @@ sealed class BottomNavItem(
     )
 }
 
+
 @Composable
-fun MainScreen(navController: NavController) {
+fun MainScreen(
+    navController: NavController,
+    dealership: Dealership? = null
+) {
     var selectedItem by remember { mutableStateOf<BottomNavItem>(BottomNavItem.Catalog) }
+
 
     Box(
         modifier = Modifier
@@ -52,7 +58,7 @@ fun MainScreen(navController: NavController) {
 
     ) {
         when (selectedItem) {
-            BottomNavItem.Catalog -> CatalogScreen(navController)
+            BottomNavItem.Catalog -> CatalogScreen(navController, dealership = dealership)
             BottomNavItem.Favorites -> FavoritesScreen(navController)
             BottomNavItem.Profile -> ProfileScreen(navController)
         }

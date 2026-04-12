@@ -6,28 +6,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.kachow_cursach.domain.model.Car
 import com.example.kachow_cursach.R
+import com.example.kachow_cursach.domain.model.Dealership
 import com.example.kachow_cursach.presentation.components.CarItem
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CatalogScreen(navController: NavController) {
+fun CatalogScreen(
+    navController: NavController,
+    dealership: Dealership?
+)  {
 
     val cars = listOf(
         Car(
@@ -131,23 +136,47 @@ fun CatalogScreen(navController: NavController) {
             isFavorite = true
         ),
     )
-
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = "Автокаталог",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
-                )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(20.dp)
+                    ){
+
+                        IconButton(
+                            modifier = Modifier.size(20.dp),
+                            onClick = {
+                            navController.navigate("dealership_selection") {
+                                popUpTo("main") { inclusive = true }
+                            }
+                        }) {
+                            Icon(
+                                painter = painterResource(R.drawable.icon_arrow_left),
+                                contentDescription = "Назад к выбору салона",
+                                tint = Color.White
+                            )
+                        }
+
+                        Text(
+
+                            text = "Автокаталог",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        if (dealership != null) {
+                            Text(
+                                text = dealership.name,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
             )
-        },
+        }
     ) { paddingValues ->
         LazyVerticalStaggeredGrid(
             columns = StaggeredGridCells.Fixed(2),

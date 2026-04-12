@@ -113,7 +113,7 @@ fun CarDetailScreen(
                 items(images.size) { index ->
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .width(400.dp)
                             .height(300.dp)
                             .clip(RoundedCornerShape(16.dp))
                             .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
