@@ -27,7 +27,7 @@ fun NavGraph() {
 
     NavHost(
         navController = navController,
-        startDestination = "car_detail/1"
+        startDestination = "login"
         ) {
         composable("login") {
             LoginScreen(navController)

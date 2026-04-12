@@ -222,18 +222,22 @@ fun CarDetailScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
 
+                //  --------------Характеристики--------------
                 Card(
-                    modifier = Modifier.height(400.dp),
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surface
                     ),
                     elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                 ) {
+
                     Text(
                         modifier = Modifier.padding(start = 10.dp, top = 5.dp),
                         text = "Характеристики",
-                        fontSize = 28.sp,
+                        fontSize = 30.sp,
                         color = MaterialTheme.colorScheme.onSurface
                     )
 
@@ -243,85 +247,134 @@ fun CarDetailScreen(
                         modifier = Modifier
                             .padding(10.dp)
                             .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
 
                         Icon(
                             painter = painterResource(id = R.drawable.icon_engine),
                             contentDescription = "двигатель",
-                            modifier = Modifier.size(50.dp),
+                            modifier = Modifier.size(45.dp),
                             tint = Color.White
                         )
                         Column {
                             Text(
                                 text = "${car.horsepower} л.с.",
-                                fontSize = 25.sp,
+                                fontSize = 23.sp,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
 
                             Text(
                                 text = "${car.engine}",
-                                fontSize = 22.sp,
+                                fontSize = 20.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
 
-                    }
+                        Icon(
+                            painter = painterResource(id = R.drawable.icon_transmission),
+                            contentDescription = "трансмиссия",
+                            modifier = Modifier.size(45.dp),
+                            tint = Color.White
+                        )
+                        Column {
+                            Text(
+                                text = "${car.transmission}",
+                                fontSize = 23.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "AT",
+                                fontSize = 20.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
 
                     Row(
                         modifier = Modifier
                             .padding(10.dp)
                             .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.icon_fuel),
-                            contentDescription = "двигатель",
-                            modifier = Modifier.size(50.dp),
+                            contentDescription = "Тип топлива",
+                            modifier = Modifier.size(45.dp),
                             tint = Color.White
                         )
 
-                        Text(
-                            text = "бензин",
-                            fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    // Описание
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surface
-                        ),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp)
-                        ) {
+                        Column {
                             Text(
-                                text = "Описание",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
+                                text = "Гибрид",
+                                fontSize = 23.sp,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
+
                             Text(
-                                text = car.description,
-                                fontSize = 14.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                lineHeight = 20.sp
+                                text = "топливо",
+                                fontSize = 20.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
+                        Icon(
+                            painter = painterResource(id = R.drawable.icon_drive),
+                            contentDescription = "Привод",
+                            modifier = Modifier.size(45.dp),
+                            tint = Color.White
+                        )
+
+                        Column {
+                            Text(
+                                text = "${car.driveUnit}",
+                                fontSize = 23.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+
+                            Text(
+                                text = "4WD",
+                                fontSize = 20.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
                 }
 
+                Spacer(modifier = Modifier.height(24.dp))
+
+                //  --------------Описание--------------
+                Card(
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
+
+                    Text(
+                        modifier = Modifier.padding(start = 10.dp, top = 5.dp),
+                        text = "Описание",
+                        fontSize = 30.sp,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Column (
+                        modifier = Modifier.padding(10.dp)
+                    ) {
+                        Text(
+                            text = car.description,
+                            fontSize = 18.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            lineHeight = 20.sp
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -418,50 +471,6 @@ fun CarDetailScreen(
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
-            }
-        }
-    }
-}
-
-@Composable
-fun DetailChip(
-    icon: String,
-    label: String,
-    value: String,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier
-            .height(70.dp),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = icon,
-                fontSize = 24.sp
-            )
-            Column {
-                Text(
-                    text = label,
-                    fontSize = 11.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = value,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
             }
         }
     }
