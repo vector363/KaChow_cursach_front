@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("org.jetbrains.dokka") version "1.9.20"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
 }
 
 android {
@@ -44,6 +46,13 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1") //Экран-заставка
     implementation("io.coil-kt:coil-compose:2.6.0")// фото в полноэкранном режиме
 
+    implementation("io.ktor:ktor-client-core:2.3.12") // ktor client
+    implementation("io.ktor:ktor-client-cio:2.3.12") // ktor client
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.12") // ktor client
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.12") // ktor client
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0") // Kotlinx serialization
+    implementation("io.coil-kt:coil-compose:2.6.0") // Coil для загрузки фото
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -60,4 +69,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+tasks.dokkaHtml {
+    outputDirectory.set(file("$buildDir/dokka"))
 }

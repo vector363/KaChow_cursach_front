@@ -15,6 +15,10 @@ import androidx.navigation.NavController
 import com.example.kachow_cursach.R
 import com.example.kachow_cursach.domain.model.Dealership
 
+/**
+ * Основной экран приложения с BottomBar
+ */
+
 
 sealed class BottomNavItem(
     val route: String,

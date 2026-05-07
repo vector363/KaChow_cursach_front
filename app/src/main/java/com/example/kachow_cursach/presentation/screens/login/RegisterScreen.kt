@@ -32,18 +32,24 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.sp
 import com.example.kachow_cursach.R
+import com.example.kachow_cursach.di.AppModule
 import com.example.kachow_cursach.domain.validation.ValidationUtils
 import com.example.kachow_cursach.presentation.components.CustomSnackbar
+import com.example.kachow_cursach.presentation.viewmodel.AuthViewModel
 
 
 @Composable
-fun RegisterScreen(navController: NavController){
+fun RegisterScreen(
+    navController: NavController,
+    authViewModel: AuthViewModel = AppModule.provideAuthViewModel()){
+
     var passwordVisible by remember { mutableStateOf(false) }
+
+    var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var repeatPassword by remember { mutableStateOf("") }
 
-    // Валидация
     var showError by remember { mutableStateOf(false) }
     val isEmailValid = ValidationUtils.isValidEmail(email)
     val isPasswordValid = ValidationUtils.isValidPassword(password)
@@ -51,8 +57,8 @@ fun RegisterScreen(navController: NavController){
     val isFormValid = isEmailValid && isPasswordValid && doPasswordsMatch &&
             password.isNotEmpty() && repeatPassword.isNotEmpty()
 
-    //диалог
     var showSuccessDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
 
 
     Box(
@@ -91,6 +97,47 @@ fun RegisterScreen(navController: NavController){
                 )
 
                 Spacer(modifier = Modifier.height(15.dp))
+
+                TextField(
+                    value = username,
+                    onValueChange = {username = it},
+                    label = { Text("Введите имя пользователя") },
+                    textStyle = LocalTextStyle.current.copy(
+                        fontSize = 18.sp,
+                        lineHeight = 28.sp
+                    ),
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .fillMaxWidth(),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                        unfocusedIndicatorColor = if (username.isNotEmpty() && !isEmailValid)
+                            MaterialTheme.colorScheme.error
+                        else
+                            MaterialTheme.colorScheme.primary,
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        focusedLabelColor = MaterialTheme.colorScheme.primary,
+                        unfocusedLabelColor = if (email.isNotEmpty() && !isEmailValid)
+                            MaterialTheme.colorScheme.error
+                        else
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                    ),
+                    singleLine = true,
+                    isError = email.isNotEmpty() && !isEmailValid,
+                    supportingText = {
+                        if (email.isNotEmpty() && !isEmailValid) {
+                            Text(
+                                text = "Имя пользователя занято",
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                )
 
                 TextField(
                     value = email,
@@ -243,13 +290,27 @@ fun RegisterScreen(navController: NavController){
 
                 Button(
                     onClick = {
-                        showSuccessDialog = true
-
                         if (isFormValid) {
-                            showError = false
-                            showSuccessDialog = true
-                        } else {
+                            authViewModel.register(
+                                username = username,
+                                email = email,
+                                password = password,
+                                onSuccess = {
+                                    showError = false
+                                    showSuccessDialog = true
+                                    navController.navigate("dealership_selection"){
+                                        popUpTo("register") { inclusive = true }
+                                    }
+                                },
+                                onError = { message  ->
+                                    showError = true
+                                    errorMessage = message
+                                }
+
+                            )
+                        }else {
                             showError = true
+                            errorMessage = "Заполните все поля корректно"
                         }
                     },
                     modifier = Modifier
@@ -268,9 +329,10 @@ fun RegisterScreen(navController: NavController){
 
                 if (showError) {
                     Text(
-                        text = "Заполните все поля корректно",
+                        text = errorMessage,
                         color = MaterialTheme.colorScheme.error,
-                        fontSize = 14.sp
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(horizontal = 16.dp)
                     )
                 }
 

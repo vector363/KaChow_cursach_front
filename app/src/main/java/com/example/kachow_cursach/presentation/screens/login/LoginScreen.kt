@@ -32,20 +32,25 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import com.example.kachow_cursach.di.AppModule
 import com.example.kachow_cursach.domain.validation.ValidationUtils
+import com.example.kachow_cursach.presentation.viewmodel.AuthViewModel
 
 
 @Composable
-fun LoginScreen(navController: NavController){
+fun LoginScreen(
+    navController: NavController,
+    authViewModel: AuthViewModel = AppModule.provideAuthViewModel()){
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
-    // Валидация
     var showError by remember { mutableStateOf(false) }
     val isEmailValid = ValidationUtils.isValidEmail(email)
     val isPasswordValid = ValidationUtils.isValidPassword(password)
     val isFormValid = isEmailValid && isPasswordValid
+
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -192,14 +197,29 @@ fun LoginScreen(navController: NavController){
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Button(
-                    onClick = {navController.navigate("dealership_selection")},
+                    onClick = {
+                        if (isFormValid) {
+                            authViewModel.login(
+                                email = email,
+                                password = password,
+                                onSuccess = {
+                                    showError = false
+                                    navController.navigate("dealership_selection")
+                                },
+                                onError = { errorMessage ->
+                                    showError = true
+                                }
+                            )
+                        }else {
+                            showError = true
+                        }
+                    },
                     modifier = Modifier
                         .width(220.dp)
                         .height(53.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary
-                    )
-                ) {
+                    )) {
                     Text(
                         text = "Войти",
                         fontSize = 24.sp,

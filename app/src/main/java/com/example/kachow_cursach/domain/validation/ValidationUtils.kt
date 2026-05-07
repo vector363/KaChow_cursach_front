@@ -2,6 +2,10 @@ package com.example.kachow_cursach.domain.validation
 
 import java.util.regex.Pattern
 
+/**
+ * Объект для валидации вводим значений полльзователем на экране логина и регистрации
+*/
+
 object ValidationUtils {
 
     fun isValidEmail(email: String): Boolean {
