@@ -1,6 +1,5 @@
 package com.example.kachow_cursach.presentation.screens.main
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,30 +16,31 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.kachow_cursach.R
+import com.example.kachow_cursach.data.model.DealershipDto
+import com.example.kachow_cursach.data.network.KtorClient
+import com.example.kachow_cursach.di.AppModule
 import com.example.kachow_cursach.domain.model.Dealership
 import com.example.kachow_cursach.presentation.theme.primaryContainerColor
+import com.example.kachow_cursach.presentation.viewmodel.DealershipViewModel
 
-
-data class DealershipWithImage(
-    val id: Int,
-    val name: String,
-    val address: String,
-    val imageRes: Int
-)
 
 @Composable
 fun DealershipSelectionScreen(
     navController: NavController,
-    onDealershipSelected: (Dealership) -> Unit
+    onDealershipSelected: (Dealership) -> Unit,
+    viewModel: DealershipViewModel = AppModule.provideDealershipViewModel()
 ) {
-    val dealerships = listOf(
-        DealershipWithImage(1, "JetCar", "г. Москва, ул. Ленина, 15", R.drawable.jetcar_preview),
-        DealershipWithImage(2, "GearSale", "г. Москва, Московская ул., 42", R.drawable.dealership_preview),
-        DealershipWithImage(3, "Rolf", "г. Оренбург, пр. Победы, 8", R.drawable.rolf_preview),
-    )
+    val dealerships by viewModel.dealerships.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val error by viewModel.error.collectAsState()
 
-    Scaffold{ paddingValues ->
+    LaunchedEffect(Unit) {
+        viewModel.loadDealerships()
+    }
+
+    Scaffold { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -52,23 +52,63 @@ fun DealershipSelectionScreen(
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(16.dp)
-
             )
 
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.padding(horizontal = 16.dp)
-            ) {
-                items(dealerships) { dealership ->
-                    DealershipCard(
-                        dealership = dealership,
-                        onClick = {
-                            onDealershipSelected(
-                                Dealership(dealership.id, dealership.name, dealership.address)
-                            )
-                            navController.navigate("main")
+            when {
+                isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+                error != null -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text("Ошибка: $error", color = MaterialTheme.colorScheme.error)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Button(onClick = { viewModel.loadDealerships() }) {
+                                Text("Повторить")
+                            }
                         }
-                    )
+                    }
+                }
+                dealerships.isEmpty() -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Нет доступных автосалонов")
+                    }
+                }
+                else -> {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    ) {
+                        items(dealerships) { dealership ->
+                            DealershipCard(
+                                dealership = dealership,
+                                onClick = {
+                                    onDealershipSelected(
+                                        Dealership(
+                                            id = dealership.id,
+                                            name = dealership.name,
+                                            address = dealership.address,
+                                            imageUrl = dealership.imageUrl
+                                        )
+                                    )
+                                    navController.navigate("main") {
+                                        popUpTo("dealership_selection") { inclusive = true }
+                                    }
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -77,7 +117,7 @@ fun DealershipSelectionScreen(
 
 @Composable
 fun DealershipCard(
-    dealership: DealershipWithImage,
+    dealership: DealershipDto,
     onClick: () -> Unit
 ) {
     Card(
@@ -97,12 +137,25 @@ fun DealershipCard(
                     .height(220.dp)
                     .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
             ) {
-                Image(
-                    painter = painterResource(id = dealership.imageRes),
-                    contentDescription = "превью автосалона jetCar",
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
+                if (dealership.imageUrl != null) {
+                    val fullUrl = KtorClient.getFullUrl(dealership.imageUrl ?: "")
+                    println(">>> Loading image from: $fullUrl")
+
+                    AsyncImage(
+                        model = fullUrl,
+                        contentDescription = "Фото салона ${dealership.name}",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                        error = painterResource(R.drawable.dealership_preview)
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("фото отсутствует", fontSize = 48.sp)
+                    }
+                }
             }
             Row(
                 modifier = Modifier
@@ -123,7 +176,7 @@ fun DealershipCard(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "${dealership.address}",
+                        text = dealership.address,
                         fontSize = 16.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -141,7 +194,7 @@ fun DealershipCard(
                     ) {
                         Text(
                             modifier = Modifier.padding(8.dp),
-                            text = "кол-во авто: 150",
+                            text = "кол-во авто: ${dealership.carCount}",
                             fontSize = 14.sp,
                             color = MaterialTheme.colorScheme.onSurface
                         )
@@ -154,7 +207,7 @@ fun DealershipCard(
                     ) {
                         Text(
                             modifier = Modifier.padding(8.dp),
-                            text = "рейтинг ⭐ 4.5",
+                            text = "рейтинг ⭐ ${dealership.rating}",
                             fontSize = 14.sp,
                             color = MaterialTheme.colorScheme.onSurface
                         )

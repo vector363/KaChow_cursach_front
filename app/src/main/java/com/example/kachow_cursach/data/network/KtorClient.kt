@@ -17,4 +17,7 @@ object KtorClient {
             })
         }
     }
+    fun getFullUrl(path: String): String {
+        return "$BASE_URL$path"
+    }
 }

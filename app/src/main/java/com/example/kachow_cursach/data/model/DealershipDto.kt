@@ -8,5 +8,6 @@ data class DealershipDto(
     val name: String,
     val address: String,
     val rating: String,
-    val carCount: Int? = null
+    val carCount: Int? = 0,
+    val imageUrl: String? = null
 )

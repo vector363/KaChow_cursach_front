@@ -1,12 +1,14 @@
 package com.example.kachow_cursach.data.network
 
 import com.example.kachow_cursach.data.model.AuthResponse
+import com.example.kachow_cursach.data.model.CarDto
 import com.example.kachow_cursach.data.model.DealershipDto
 import com.example.kachow_cursach.data.model.ErrorResponse
 import com.example.kachow_cursach.data.model.LoginRequest
 import com.example.kachow_cursach.data.model.RegisterRequest
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
@@ -15,6 +17,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
+
 
 class ApiService(
     private val client: HttpClient = KtorClient.client
@@ -36,7 +39,6 @@ class ApiService(
             setBody(RegisterRequest(username, email, password))
         }
         val rawResponse = response.body<String>()
-        println(">>> RAW REGISTER RESPONSE: $rawResponse")
 
         val jsonElement = json.parseToJsonElement(rawResponse)
         if (jsonElement.jsonObject.containsKey("error")) {
@@ -53,4 +55,39 @@ class ApiService(
             }
         }.body()
     }
+
+    suspend fun getCarsByDealership(token: String, dealershipId: Int): List<CarDto> {
+        val response = client.get("${KtorClient.BASE_URL}/car/dealership/$dealershipId") {
+            headers {
+                append("Authorization", "Bearer $token")
+            }
+        }
+        val rawResponse = response.body<String>()
+        return json.decodeFromString<List<CarDto>>(rawResponse)
+    }
+
+    suspend fun getFavorites(token: String): List<CarDto> {
+        return client.get("${KtorClient.BASE_URL}/favorites") {
+            headers {
+                append("Authorization", "Bearer $token")
+            }
+        }.body()
+    }
+
+    suspend fun addToFavorites(token: String, carId: Int) {
+        client.post("${KtorClient.BASE_URL}/favorites/$carId") {
+            headers {
+                append("Authorization", "Bearer $token")
+            }
+        }
+    }
+
+    suspend fun removeFromFavorites(token: String, carId: Int) {
+        client.delete("${KtorClient.BASE_URL}/favorites/$carId") {
+            headers {
+                append("Authorization", "Bearer $token")
+            }
+        }
+    }
+
 }
