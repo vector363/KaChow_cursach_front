@@ -17,13 +17,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.kachow_cursach.R
-import com.example.kachow_cursach.domain.model.Car
+import com.example.kachow_cursach.data.model.CarDto
+import com.example.kachow_cursach.data.network.KtorClient
 
 
 @Composable
 fun CarItem(
-    car: Car,
+    car: CarDto,
     onClick: () -> Unit,
     onFavoriteClick: () -> Unit
 ) {
@@ -54,23 +56,57 @@ fun CarItem(
                         .clip(RoundedCornerShape(8.dp))
                         .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
                 ) {
-                    if (car.imageRes != null) {
-                        Image(
-                            painter = painterResource(id = car.imageRes),
-                            contentDescription = car.brand + car.model,
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
-                    } else {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
+                    Box(
+                        modifier = Modifier
+                            .width(240.dp)
+                            .height(140.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
+                    ) {
+                        // Фото (если есть)
+                        if (car.imageUrl != null) {
+                            AsyncImage(
+                                model = KtorClient.getFullUrl(car.imageUrl),
+                                contentDescription = "${car.brand} ${car.model}",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            // Заглушка, если фото нет
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(text = "🚗", fontSize = 40.sp)
+                            }
+                        }
+
+                        // Кнопка избранного поверх фото
+                        IconButton(
+                            onClick = onFavoriteClick,
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(4.dp)
                         ) {
-                            Text(
-                                text = "🚗",
-                                fontSize = 40.sp
+                            Icon(
+                                painter = painterResource(
+                                    id = if (car.isFavorite) R.drawable.icon_favorite_switch
+                                    else R.drawable.icon_favorite_unswitch
+                                ),
+                                contentDescription = if (car.isFavorite) "Удалить из избранного" else "Добавить в избранное",
+                                tint = if (car.isFavorite) Color.Red else MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(24.dp)
                             )
                         }
+                    }
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "🚗",
+                            fontSize = 40.sp
+                        )
                     }
 
                     IconButton(
@@ -129,7 +165,7 @@ fun CarItem(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = car.year,
+                        text = car.year.toString(),
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

@@ -1,141 +1,43 @@
 package com.example.kachow_cursach.presentation.screens.main
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.kachow_cursach.domain.model.Car
+import androidx.navigation.NavController
 import com.example.kachow_cursach.R
+import com.example.kachow_cursach.di.AppModule
 import com.example.kachow_cursach.domain.model.Dealership
 import com.example.kachow_cursach.presentation.components.CarItem
+import com.example.kachow_cursach.presentation.viewmodel.CarViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CatalogScreen(
     navController: NavController,
-    dealership: Dealership?
+    dealership: Dealership?,
+    carViewModel: CarViewModel = AppModule.provideCarViewModel()
 )  {
+    val cars by carViewModel.cars.collectAsState()
+    val isLoading by carViewModel.isLoading.collectAsState()
+    val error by carViewModel.error.collectAsState()
 
-    val cars = listOf(
-        Car(
-            id = 1,
-            brand = "BMW",
-            model = "E60",
-            price = 1000000,
-            year = "2023",
-            mileage = 5000,
-            imageRes = R.drawable.e60_image,
-            isFavorite = false
-        ),
-        Car(
-            id = 2,
-            brand = "Mitsubishi",
-            model = "Evolution 9",
-            price = 45000,
-            year = "2022",
-            mileage = 3000,
-            imageRes = R.drawable.evo_9_image,
-            isFavorite = true
-        ),
-        Car(
-            id = 3,
-            brand = "BMW",
-            model = "M4G82",
-            price = 205000,
-            year = "2023",
-            mileage = 5000,
-            imageRes = R.drawable.m4_bmw,
-            isFavorite = false
-        ),
-        Car(
-            id = 4,
-            brand = "BMW",
-            model = "E60",
-            price = 4500000,
-            year = "2022",
-            mileage = 3000,
-            imageRes = R.drawable.alfa_romeo,
-            isFavorite = true
-        ),
-        Car(
-            id = 5,
-            brand = "BMW",
-            model = "M4G82",
-            price = 25000000,
-            year = "2023",
-            mileage = 5000,
-            imageRes = R.drawable.e60_image,
-            isFavorite = false
-        ),
-        Car(
-            id = 6,
-            brand = "BMW",
-            model = "E60",
-            price = 4532000,
-            year = "2022",
-            mileage = 3000,
-            imageRes = R.drawable.alfa_romeo,
-            isFavorite = true
-        ),
-        Car(
-            id = 7,
-            brand = "Cadillac",
-            model = "Escalade",
-            price = 2504300,
-            year = "2023",
-            mileage = 5000,
-            imageRes = R.drawable.e60_image,
-            isFavorite = false
-        ),
-        Car(
-            id = 8,
-            brand = "Mersedec-Benz",
-            model = "E63 AMG",
-            price = 4503400,
-            year = "2022",
-            mileage = 3233000,
-            imageRes = null,
-            isFavorite = true
-        ),
-        Car(
-            id = 9,
-            brand = "Cadillac",
-            model = "Escalade",
-            price = 2504300,
-            year = "2023",
-            mileage = 53232000,
-            imageRes = R.drawable.m4_bmw,
-            isFavorite = false
-        ),
-        Car(
-            id = 10,
-            brand = "Mersedec-Benz",
-            model = "E63 AMG",
-            price = 4503400,
-            year = "2022",
-            mileage = 3000,
-            imageRes = null,
-            isFavorite = true
-        ),
-    )
+    LaunchedEffect(dealership) {
+        dealership?.let {
+            carViewModel.loadCars(it.id)
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -193,7 +95,11 @@ fun CatalogScreen(
                         navController.navigate("car_detail/${car.id}")
                     },
                     onFavoriteClick = {
-                        // обновление избранного
+                        carViewModel.toggleFavorite(car.id, car.isFavorite) { success ->
+                            if (success) {
+                                dealership?.let { carViewModel.loadCars(it.id) }
+                            }
+                        }
                     }
                 )
             }
