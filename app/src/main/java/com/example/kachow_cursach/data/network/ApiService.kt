@@ -1,11 +1,14 @@
 package com.example.kachow_cursach.data.network
 
 import com.example.kachow_cursach.data.model.AuthResponse
+import com.example.kachow_cursach.data.model.DealershipDto
 import com.example.kachow_cursach.data.model.ErrorResponse
 import com.example.kachow_cursach.data.model.LoginRequest
 import com.example.kachow_cursach.data.model.RegisterRequest
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -41,5 +44,13 @@ class ApiService(
             throw Exception(errorResponse.error)
         }
         return json.decodeFromString<AuthResponse>(rawResponse)
+    }
+
+    suspend fun getDealerships(token: String): List<DealershipDto> {
+        return client.get("${KtorClient.BASE_URL}/dealership/all") {
+            headers {
+                append("Authorization", "Bearer $token")
+            }
+        }.body()
     }
 }

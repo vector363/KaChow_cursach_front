@@ -21,16 +21,12 @@ class AuthViewModel(
 
     fun register(username: String, email: String, password: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
-            println(">>> REGISTER CALL: $username / $email / $password")
             val result = repository.register(username, email, password)
-            println(">>> REGISTER RESULT: $result")
             result.fold(
                 onSuccess = {
-                    println(">>> REGISTER SUCCESS")
                     onSuccess()
                 },
                 onFailure = {
-                    println(">>> REGISTER ERROR: ${it.message}")
                     onError(it.message ?: "Ошибка регистрации")
                 }
             )

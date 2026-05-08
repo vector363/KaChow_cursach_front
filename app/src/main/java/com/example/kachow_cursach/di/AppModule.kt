@@ -6,6 +6,7 @@ import com.example.kachow_cursach.data.network.ApiService
 import com.example.kachow_cursach.data.repository.MainRepository
 import com.example.kachow_cursach.presentation.viewmodel.AuthViewModel
 import com.example.kachow_cursach.presentation.viewmodel.CarViewModel
+import com.example.kachow_cursach.presentation.viewmodel.DealershipViewModel
 
 object AppModule {
     private lateinit var tokenManager: TokenManager
@@ -24,5 +25,9 @@ object AppModule {
 
     fun provideCarViewModel(): CarViewModel {
         return CarViewModel(mainRepository)
+    }
+
+    fun provideDealershipViewModel(): DealershipViewModel {
+        return DealershipViewModel(mainRepository)
     }
 }

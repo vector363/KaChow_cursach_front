@@ -2,6 +2,7 @@ package com.example.kachow_cursach.data.repository
 
 import com.example.kachow_cursach.data.local.TokenManager
 import com.example.kachow_cursach.data.model.AuthResponse
+import com.example.kachow_cursach.data.model.DealershipDto
 import com.example.kachow_cursach.data.network.ApiService
 
 class MainRepository(
@@ -31,4 +32,15 @@ class MainRepository(
     fun logout() {
         tokenManager.clearToken()
     }
+
+    suspend fun getDealerships(): Result<List<DealershipDto>>{
+        val token = tokenManager.getToken() ?: return Result.failure(Exception("Not authenticated"))
+        return try {
+            val response = apiService.getDealerships(token)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
 }

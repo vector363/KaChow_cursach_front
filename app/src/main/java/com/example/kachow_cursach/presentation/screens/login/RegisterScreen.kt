@@ -298,9 +298,6 @@ fun RegisterScreen(
                                 onSuccess = {
                                     showError = false
                                     showSuccessDialog = true
-                                    navController.navigate("dealership_selection"){
-                                        popUpTo("register") { inclusive = true }
-                                    }
                                 },
                                 onError = { message  ->
                                     showError = true
@@ -367,13 +364,13 @@ fun RegisterScreen(
 
                 if (showSuccessDialog) {
                     CustomSnackbar(
+                        username = username,
                         message = "Аккаунт успешно создан!",
                         isSuccess = true,
                         onDismiss = {
                             showSuccessDialog = false
-                            navController.navigate("login") {
-                                popUpTo("register") { inclusive = true }
-                            }
+
+                            navController.navigate("dealership_selection")
                         }
                     )
                 }
