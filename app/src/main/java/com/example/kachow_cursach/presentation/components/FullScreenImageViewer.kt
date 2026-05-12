@@ -11,22 +11,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import coil.compose.AsyncImage
 import com.example.kachow_cursach.R
+import com.example.kachow_cursach.data.network.KtorClient
 
 
 @Composable
 fun FullScreenImageViewer(
-    images: List<Int>,
-    initialIndex: Int = 0,
+    images: List<String>,
+    initialIndex: Int,
     onDismiss: () -> Unit
 ) {
     var currentIndex by remember { mutableStateOf(initialIndex) }
     var resetZoomTrigger by remember { mutableStateOf(0) }
+
+    println("экран просмотра фото запущен!")
+
+    println("фото: ${KtorClient.getFullUrl(images[currentIndex])}")
+
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -48,10 +56,17 @@ fun FullScreenImageViewer(
                 }
 
         ) {
-            ZoomableImage(
-                imageRes = images[currentIndex],
+//            ZoomableImage(
+//                imageUrl = images[currentIndex],
+//                modifier = Modifier.fillMaxSize(),
+//                resetTrigger = resetZoomTrigger,
+//                contentDescription = "Полноэкранное фото"
+//            )
+            AsyncImage(
+                model = KtorClient.getFullUrl(images[currentIndex]),
+                contentDescription = "фото: ${currentIndex}",
                 modifier = Modifier.fillMaxSize(),
-                resetTrigger = resetZoomTrigger
+                contentScale = ContentScale.Crop
             )
 
             IconButton(

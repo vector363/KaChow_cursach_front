@@ -1,6 +1,5 @@
 package com.example.kachow_cursach.presentation.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -20,30 +19,32 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import coil.compose.AsyncImage
 import com.example.kachow_cursach.R
-import com.example.kachow_cursach.domain.model.Car
+import com.example.kachow_cursach.data.model.CarDto
+import com.example.kachow_cursach.data.model.CarImageDto
+import com.example.kachow_cursach.data.network.KtorClient
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun FavoriteCarCard(
-    car: Car,
+    car: CarDto,
+    images: List<CarImageDto>,
     onClick: () -> Unit,
     onFavoriteClick: () -> Unit
 ) {
-
-    val images = listOfNotNull(
-        car.imageRes,
-        R.drawable.e60_image,
-        R.drawable.e60_1webp,
-        R.drawable.e60_2webp,
-        R.drawable.e60_3
-    ).distinct()
-
     var currentImageIndex by remember { mutableStateOf(0) }
     val listState = rememberLazyListState()
     val hapticFeedback = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.firstVisibleItemIndex }
+            .collect { index ->
+                currentImageIndex = index
+            }
+    }
 
     Card(
         modifier = Modifier
@@ -78,9 +79,18 @@ fun FavoriteCarCard(
                                 .height(240.dp)
                                 .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
                         ) {
-                            Image(
-                                painter = painterResource(id = imageRes),
-                                contentDescription = car.brand,
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "🚗",
+                                    fontSize = 40.sp
+                                )
+                            }
+                            AsyncImage(
+                                model = KtorClient.getFullUrl(imageRes.imageUrl),
+                                contentDescription = "${car.brand} ${car.model}",
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop
                             )
@@ -170,7 +180,7 @@ fun FavoriteCarCard(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = car.year,
+                            text = car.year.toString(),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.onSurface

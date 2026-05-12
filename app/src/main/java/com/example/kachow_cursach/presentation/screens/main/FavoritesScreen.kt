@@ -16,10 +16,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,24 +28,33 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.kachow_cursach.R
-import com.example.kachow_cursach.domain.model.Car
+import com.example.kachow_cursach.di.AppModule
 import com.example.kachow_cursach.presentation.components.FavoriteCarCard
+import com.example.kachow_cursach.presentation.viewmodel.CarViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FavoritesScreen(navController: NavController) {
+fun FavoritesScreen(
+    navController: NavController,
+    carViewModel: CarViewModel = AppModule.provideCarViewModel()
+) {
+    val favorites by carViewModel.favorites.collectAsState()
+    val carImages by carViewModel.carImages.collectAsState()
+    val isLoading by carViewModel.isLoading.collectAsState()
+    val error by carViewModel.error.collectAsState()
 
-    var favoriteCars by remember {
-        mutableStateOf(
-            listOf(
-                Car(2, "Mitsubishi", "Evolution 9", 4544000, "2022", 333000, R.drawable.m4_bmw, true),
-                Car(7, "Porsche", "911 Turbo", 7440000, "2024", 523200, R.drawable.e60_image, true),
-                Car(5, "Mercedes", "E63 AMG", 6524000, "2022", 63242000, R.drawable.alfa_romeo, true),
-            )
-        )
+    LaunchedEffect(favorites) {
+        println(">>> [FavoritesScreen] Favorites updated: ${favorites.size} cars")
+        favorites.forEach { car ->
+            println(">>> [FavoritesScreen] Car: ${car.brand} ${car.model}, price=${car.price}")
+        }
     }
-//    var favoriteCars by remember {mutableStateOf(emptyList<Car>()) }
+
+    LaunchedEffect(Unit) {
+        println(">>> [FavoritesScreen] Loading favorites")
+        carViewModel.loadFavorites()
+    }
 
     Scaffold(
         topBar = {
@@ -65,7 +73,7 @@ fun FavoritesScreen(navController: NavController) {
             )
         },
     ) { paddingValues ->
-        if (favoriteCars.isEmpty()) {
+        if (favorites.isEmpty()) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -100,12 +108,19 @@ fun FavoritesScreen(navController: NavController) {
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                items(favoriteCars) { car ->
+                items(favorites) { car ->
                     FavoriteCarCard(
                         car = car,
+                        images = carImages[car.id] ?: emptyList(),
                         onClick = {
+                            navController.navigate("car_detail/${car.id}")
                         },
                         onFavoriteClick = {
+                            carViewModel.toggleFavorite(car.id, true) { success ->
+                                if (success) {
+
+                                }
+                            }
                         }
                     )
                 }

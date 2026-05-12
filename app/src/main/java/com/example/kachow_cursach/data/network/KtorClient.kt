@@ -7,7 +7,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
 object KtorClient {
-    const val BASE_URL = "http://172.19.6.100:8080"
+    const val BASE_URL = "http://10.11.2.100:8080"
 
     val client = HttpClient(CIO) {
         install(ContentNegotiation) {

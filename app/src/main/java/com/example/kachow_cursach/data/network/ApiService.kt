@@ -1,11 +1,15 @@
 package com.example.kachow_cursach.data.network
 
 import com.example.kachow_cursach.data.model.AuthResponse
+import com.example.kachow_cursach.data.model.CarDetailDto
+import com.example.kachow_cursach.data.model.CarDetailResponse
 import com.example.kachow_cursach.data.model.CarDto
+import com.example.kachow_cursach.data.model.CarImageDto
 import com.example.kachow_cursach.data.model.DealershipDto
 import com.example.kachow_cursach.data.model.ErrorResponse
 import com.example.kachow_cursach.data.model.LoginRequest
 import com.example.kachow_cursach.data.model.RegisterRequest
+import com.example.kachow_cursach.data.network.KtorClient.BASE_URL
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
@@ -90,4 +94,18 @@ class ApiService(
         }
     }
 
+    suspend fun getCarImages(token: String, carId: Int): List<CarImageDto> {
+        return client.get("${BASE_URL}/car/$carId/images") {
+            headers {
+                append("Authorization", "Bearer $token")
+            }
+        }.body()
+    }
+
+    suspend fun getCarDetail(token: String, carId: Int): CarDetailResponse {
+        println(">>> getCarDetail: calling for carId=$carId")
+        return client.get("${BASE_URL}/car/$carId") {
+            headers { append("Authorization", "Bearer $token") }
+        }.body()
+    }
 }

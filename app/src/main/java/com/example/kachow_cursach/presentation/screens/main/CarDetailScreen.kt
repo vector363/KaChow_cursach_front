@@ -11,8 +11,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,40 +23,54 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.kachow_cursach.R
-import com.example.kachow_cursach.domain.model.Car
+import com.example.kachow_cursach.data.network.KtorClient
+import com.example.kachow_cursach.di.AppModule
 import com.example.kachow_cursach.presentation.components.FullScreenImageViewer
+import com.example.kachow_cursach.presentation.viewmodel.CarViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CarDetailScreen(
     navController: NavController,
-    car: Car
+    carId: Int,
+    carViewModel: CarViewModel = AppModule.provideCarViewModel()
 ) {
-    var isFavorite by remember { mutableStateOf(car.isFavorite) }
+    println("CarDetailScreen запущен")
+
     var showFullScreenImage by remember { mutableStateOf(false) }
     var selectedImageIndex by remember { mutableStateOf(0) }
 
+    val car by carViewModel.carDetail.collectAsState()
+    val isLoading by carViewModel.isLoading.collectAsState()
+    val error by carViewModel.error.collectAsState()
 
-    val images = listOfNotNull(
-        car.imageRes,
-        R.drawable.broken_detail,
-        R.drawable.e60_1webp,
-        R.drawable.e60_2webp,
-        R.drawable.evo_9_image,
-        R.drawable.alfa_romeo,
-        R.drawable.e60_3,
-        R.drawable.e60_image
-        ).distinct()
+    LaunchedEffect(carId) {
+        carViewModel.loadCarDetail(carId)
+    }
 
-    if (showFullScreenImage) {
+    val carImagesMap by carViewModel.carImages.collectAsState()
+    val currentCarImages = remember(carImagesMap[carId]) {
+        carImagesMap[carId] ?: emptyList()
+    }
+
+    val allImages = remember(currentCarImages) {
+        currentCarImages.map { it.imageUrl }.distinct()
+    }
+
+    if (showFullScreenImage && allImages.isNotEmpty()) {
+        println("все фото: ${allImages}")
+        println("клик на фото: ${selectedImageIndex}")
         FullScreenImageViewer(
-            images = images,
+            images = allImages,
             initialIndex = selectedImageIndex,
             onDismiss = { showFullScreenImage = false }
         )
     }
+
+
 
     Scaffold(
         modifier = Modifier.padding(top = 8.dp),
@@ -67,7 +79,7 @@ fun CarDetailScreen(
                 modifier = Modifier.padding(top = 15.dp),
                 title = {
                     Text(
-                        text = "${car.brand} ${car.model}, ${car.year}",
+                        text = "${car?.brand} ${car?.model}, ${car?.year}",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -82,16 +94,25 @@ fun CarDetailScreen(
                         )
                     }
                 },
-                actions = {
-                    IconButton(onClick = { isFavorite = !isFavorite }) {
-                        Icon(
-                            imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                            modifier = Modifier.size(26.dp),
-                            contentDescription = "Избранное",
-                            tint = if (isFavorite) Color.Red else Color.White
-                        )
-                    }
-                },
+//                actions = {
+//                    IconButton(
+//                        onClick = {
+//                            car?.let {
+//                                carViewModel.toggleFavorite(
+//                                    carId = it.id,
+//                                    isCurrentlyFavorite = it.isFavorite
+//                                )
+//                            }
+//                        }
+//                    ) {
+//                        Icon(
+//                            imageVector = if (car?.isFavorite == true) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+//                            modifier = Modifier.size(26.dp),
+//                            contentDescription = "Избранное",
+//                            tint = if (car?.isFavorite == true) Color.Red else Color.White
+//                        )
+//                    }
+//                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
                 )
@@ -110,7 +131,7 @@ fun CarDetailScreen(
                     .height(300.dp),
                 horizontalArrangement = Arrangement.spacedBy(0.dp)
             ) {
-                items(images.size) { index ->
+                items(allImages.size) { index ->
                     Box(
                         modifier = Modifier
                             .width(400.dp)
@@ -118,13 +139,15 @@ fun CarDetailScreen(
                             .clip(RoundedCornerShape(16.dp))
                             .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
                             .clickable {
+                                println("клик на: ${index}")
+
                                 selectedImageIndex = index
                                 showFullScreenImage = true
                             }
                     ) {
-                        Image(
-                            painter = painterResource(id = images[index]),
-                            contentDescription = "${car.brand} ${car.model}",
+                        AsyncImage(
+                            model = KtorClient.getFullUrl(allImages[index]),
+                            contentDescription = "${car?.brand} ${car?.model}",
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop
                         )
@@ -139,7 +162,7 @@ fun CarDetailScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 contentPadding = PaddingValues(horizontal = 16.dp)
             ) {
-                items(images.size) { index ->
+                items(allImages.size) { index ->
                     Column {
                         Box(
                             modifier = Modifier
@@ -152,12 +175,12 @@ fun CarDetailScreen(
                                 },
                             contentAlignment = Alignment.Center
                         ) {
-                            Image(
-                                painter = painterResource(id = images[index]),
-                                contentDescription = "Миниатюра",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
+                            AsyncImage(
+                            model = KtorClient.getFullUrl(allImages[index]),
+                            contentDescription = "${car?.brand} ${car?.model}",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
                         }
                     }
                 }
@@ -175,13 +198,13 @@ fun CarDetailScreen(
                 ) {
                     Column {
                         Text(
-                            text = "${car.brand} ${car.model}",
+                            text = "${car?.brand} ${car?.model}",
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = car.year,
+                            text = "${car?.year}",
                             fontSize = 14.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -210,7 +233,7 @@ fun CarDetailScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                text = "1 240 000 ₽",
+                                text = "${car?.price} ₽",
                                 fontSize = 28.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface
@@ -222,7 +245,6 @@ fun CarDetailScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
 
-                //  --------------Характеристики--------------
                 Card(
                     modifier = Modifier
                         .wrapContentHeight()
@@ -258,13 +280,13 @@ fun CarDetailScreen(
                         )
                         Column {
                             Text(
-                                text = "${car.horsepower} л.с.",
+                                text = "${car?.horsepower} л.с.",
                                 fontSize = 23.sp,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
 
                             Text(
-                                text = "${car.engine}",
+                                text = "${car?.engine}",
                                 fontSize = 20.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -278,7 +300,7 @@ fun CarDetailScreen(
                         )
                         Column {
                             Text(
-                                text = "${car.transmission}",
+                                text = "${car?.transmission}",
                                 fontSize = 23.sp,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
@@ -327,7 +349,7 @@ fun CarDetailScreen(
 
                         Column {
                             Text(
-                                text = "${car.driveUnit}",
+                                text = "${car?.driveUnit}",
                                 fontSize = 23.sp,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
@@ -368,7 +390,7 @@ fun CarDetailScreen(
                         modifier = Modifier.padding(10.dp)
                     ) {
                         Text(
-                            text = car.description,
+                            text = "${car?.description}",
                             fontSize = 18.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             lineHeight = 20.sp
@@ -475,3 +497,4 @@ fun CarDetailScreen(
         }
     }
 }
+

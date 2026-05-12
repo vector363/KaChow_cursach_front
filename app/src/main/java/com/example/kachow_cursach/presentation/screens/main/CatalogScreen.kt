@@ -38,6 +38,7 @@ fun CatalogScreen(
         }
     }
 
+
     Scaffold(
         topBar = {
             TopAppBar(

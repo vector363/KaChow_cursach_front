@@ -2,11 +2,14 @@ package com.example.kachow_cursach.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.kachow_cursach.data.model.CarDetailResponse
 import com.example.kachow_cursach.data.model.CarDto
+import com.example.kachow_cursach.data.model.CarImageDto
 import com.example.kachow_cursach.data.repository.MainRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 
@@ -14,8 +17,17 @@ class CarViewModel(
     private val repository: MainRepository
 ) : ViewModel() {
 
+    private val _carImagesMap = MutableStateFlow<Map<Int, List<CarImageDto>>>(emptyMap())
+    val carImagesMap: StateFlow<Map<Int, List<CarImageDto>>> = _carImagesMap.asStateFlow()
+
+    private val _carDetail = MutableStateFlow<CarDetailResponse?>(null)
+    val carDetail: StateFlow<CarDetailResponse?> = _carDetail.asStateFlow()
+
     private val _cars = MutableStateFlow<List<CarDto>>(emptyList())
     val cars: StateFlow<List<CarDto>> = _cars.asStateFlow()
+
+    private val _favorites = MutableStateFlow<List<CarDto>>(emptyList())
+    val favorites: StateFlow<List<CarDto>> = _favorites.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -23,14 +35,18 @@ class CarViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
+    private val _carImages = MutableStateFlow<Map<Int, List<CarImageDto>>>(emptyMap())
+    val carImages: StateFlow<Map<Int, List<CarImageDto>>> = _carImages.asStateFlow()
+
     fun loadCars(dealershipId: Int) {
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
             val result = repository.getCarsByDealership(dealershipId)
             result.fold(
-                onSuccess = {
-                    _cars.value = it
+                onSuccess = { cars ->
+                    _cars.value = cars
+                    updateFavoriteStatus(cars)
                 },
                 onFailure = {
                     _error.value = it.message
@@ -44,30 +60,115 @@ class CarViewModel(
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
-            val result = repository.getFavorites()
-            result.fold(
-                onSuccess = {
-                    _cars.value = it
-                },
-                onFailure = {
-                    _error.value = it.message
+            try {
+                val result = repository.getFavorites()
+                if (result.isSuccess) {
+                    val favoritesList = result.getOrNull() ?: emptyList()
+                    _favorites.value = favoritesList
+                    println("Favorites loaded: ${favoritesList.size} cars")
+                    favoritesList.forEach { car ->
+                        println("Favorite car: ${car.brand} ${car.model}, price=${car.price}, year=${car.year}")
+                        loadCarImages(car.id)
+                    }
+                } else {
+                    _error.value = result.exceptionOrNull()?.message
                 }
-            )
+            } catch (e: Exception) {
+                _error.value = e.message
+            }
             _isLoading.value = false
         }
     }
 
-    fun toggleFavorite(carId: Int, isCurrentlyFavorite: Boolean, onComplete: (Boolean) -> Unit) {
+    fun toggleFavorite(carId: Int, isCurrentlyFavorite: Boolean, onComplete: (Boolean) -> Unit = {}) {
         viewModelScope.launch {
             val result = if (isCurrentlyFavorite) {
                 repository.removeFromFavorites(carId)
             } else {
                 repository.addToFavorites(carId)
             }
+
             result.fold(
-                onSuccess = { onComplete(true) },
-                onFailure = { onComplete(false) }
+                onSuccess = {
+                    println(">>> Toggle favorite SUCCESS for carId=$carId, wasFavorite=$isCurrentlyFavorite")
+
+                    val updatedCars = _cars.value.map { car ->
+                        if (car.id == carId) car.copy(isFavorite = !isCurrentlyFavorite) else car
+                    }
+                    _cars.value = updatedCars
+
+                    if (!isCurrentlyFavorite) {
+                        val carToAdd = updatedCars.find { it.id == carId }
+                        if (carToAdd != null) {
+                            val newFavorites = _favorites.value + carToAdd.copy(isFavorite = true)
+                            _favorites.value = newFavorites
+                            println(">>> Added to favorites, new size: ${newFavorites.size}")
+                        } else {
+                            loadFavorites()
+                        }
+                    } else {
+                        val newFavorites = _favorites.value.filter { it.id != carId }
+                        _favorites.value = newFavorites
+                        println(">>> Removed from favorites, new size: ${newFavorites.size}")
+                    }
+
+                    onComplete(true)
+                },
+                onFailure = { error ->
+                    println("Toggle favorite FAILED: ${error.message}")
+                    onComplete(false)
+                }
             )
+        }
+    }
+
+
+    private suspend fun updateFavoriteStatus(cars: List<CarDto>) {
+        try {
+            val favoritesResult = repository.getFavorites()
+            if (favoritesResult.isSuccess) {
+                val favoriteIds = favoritesResult.getOrNull()?.map { it.id } ?: emptyList()
+                val updatedCars = cars.map { car ->
+                    car.copy(isFavorite = favoriteIds.contains(car.id))
+                }
+                _cars.value = updatedCars
+            }
+        } catch (e: Exception) {
+            println("Error updating favorite status: ${e.message}")
+        }
+    }
+
+    fun loadCarImages(carId: Int) {
+        viewModelScope.launch {
+            val result = repository.getCarImages(carId)
+            result.onSuccess { images ->
+                _carImages.update { currentMap ->
+                    currentMap + (carId to images)
+                }
+                println("Loaded ${images.size} images for car $carId")
+            }.onFailure { error ->
+                println("Failed to load images for car $carId: ${error.message}")
+            }
+        }
+    }
+
+    fun loadCarDetail(carId: Int) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _error.value = null
+
+            val result = repository.getCarDetail(carId)
+            result.fold(
+                onSuccess = { carDetail ->
+                    _carDetail.value = carDetail
+                    loadCarImages(carId)
+                },
+                onFailure = { error ->
+                    _error.value = error.message
+                }
+            )
+
+            _isLoading.value = false
         }
     }
 
@@ -75,3 +176,5 @@ class CarViewModel(
         _error.value = null
     }
 }
+
+

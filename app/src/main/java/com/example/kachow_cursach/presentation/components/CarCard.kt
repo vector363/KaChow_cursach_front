@@ -41,11 +41,9 @@ fun CarItem(
         )
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
@@ -56,64 +54,27 @@ fun CarItem(
                         .clip(RoundedCornerShape(8.dp))
                         .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .width(240.dp)
-                            .height(140.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
-                    ) {
-                        // Фото (если есть)
-                        if (car.imageUrl != null) {
-                            AsyncImage(
-                                model = KtorClient.getFullUrl(car.imageUrl),
-                                contentDescription = "${car.brand} ${car.model}",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        } else {
-                            // Заглушка, если фото нет
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(text = "🚗", fontSize = 40.sp)
-                            }
-                        }
-
-                        // Кнопка избранного поверх фото
-                        IconButton(
-                            onClick = onFavoriteClick,
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .padding(4.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(
-                                    id = if (car.isFavorite) R.drawable.icon_favorite_switch
-                                    else R.drawable.icon_favorite_unswitch
-                                ),
-                                contentDescription = if (car.isFavorite) "Удалить из избранного" else "Добавить в избранное",
-                                tint = if (car.isFavorite) Color.Red else MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    }
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "🚗",
-                            fontSize = 40.sp
+                    if (car.imageUrl != null) {
+                        AsyncImage(
+                            model = KtorClient.getFullUrl(car.imageUrl),
+                            contentDescription = "${car.brand} ${car.model}",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
                         )
+                    } else {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(text = "🚗", fontSize = 40.sp)
+                        }
                     }
 
                     IconButton(
                         onClick = onFavoriteClick,
                         modifier = Modifier
                             .align(Alignment.TopEnd)
-                            .padding(2.dp)
+                            .padding(4.dp)
                     ) {
                         Icon(
                             painter = painterResource(
@@ -150,6 +111,7 @@ fun CarItem(
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
+
                 Text(
                     text = "${car.price} ₽",
                     fontSize = 20.sp,

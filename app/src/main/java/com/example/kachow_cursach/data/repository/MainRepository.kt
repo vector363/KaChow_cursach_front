@@ -2,7 +2,10 @@ package com.example.kachow_cursach.data.repository
 
 import com.example.kachow_cursach.data.local.TokenManager
 import com.example.kachow_cursach.data.model.AuthResponse
+import com.example.kachow_cursach.data.model.CarDetailDto
+import com.example.kachow_cursach.data.model.CarDetailResponse
 import com.example.kachow_cursach.data.model.CarDto
+import com.example.kachow_cursach.data.model.CarImageDto
 import com.example.kachow_cursach.data.model.DealershipDto
 import com.example.kachow_cursach.data.network.ApiService
 
@@ -85,4 +88,38 @@ class MainRepository(
         }
     }
 
+    suspend fun getCarImages(carId: Int): Result<List<CarImageDto>> {
+        val token = tokenManager.getToken()
+        return try {
+            if (token == null) {
+                return Result.failure(Exception("Not authenticated"))
+            }
+            val images = apiService.getCarImages(token, carId)
+            Result.success(images)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getCarDetail(carId: Int): Result<CarDetailResponse> {
+        val token = tokenManager.getToken()
+        println(">>> [REPO] getCarDetail START for carId=$carId")
+        println(">>> [REPO] Token exists: ${token != null}")
+
+        if (token == null) {
+            println(">>> [REPO] ERROR: No token found")
+            return Result.failure(Exception("Not authenticated"))
+        }
+
+        return try {
+            println(">>> [REPO] Calling apiService.getCarDetail...")
+            val response = apiService.getCarDetail(token, carId)
+            println(">>> [REPO] SUCCESS: ${response.brand} ${response.model}")
+            Result.success(response)
+        } catch (e: Exception) {
+            println(">>> [REPO] ERROR: ${e.message}")
+            e.printStackTrace()
+            Result.failure(e)
+        }
+    }
 }

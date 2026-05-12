@@ -16,7 +16,6 @@ import com.example.kachow_cursach.presentation.screens.main.DealershipSelectionS
 import com.example.kachow_cursach.presentation.screens.main.MainScreen
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import com.example.kachow_cursach.data.model.CarDto
 
 
 @Composable
@@ -24,8 +23,6 @@ fun NavGraph() {
     val navController = rememberNavController()
 
     var selectedDealership by remember { mutableStateOf<Dealership?>(null) }
-
-    val cars = listOf<CarDto>()
 
 
     NavHost(
@@ -62,10 +59,7 @@ fun NavGraph() {
             arguments = listOf(navArgument("carId") { type = NavType.IntType })
         ) { backStackEntry ->
             val carId = backStackEntry.arguments?.getInt("carId") ?: return@composable
-            val car = cars.find { it.id == carId }
-            if (car != null) {
-                CarDetailScreen(navController, car)
-            }
+            CarDetailScreen(navController, carId)
         }
     }
 }

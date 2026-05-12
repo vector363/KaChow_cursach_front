@@ -8,14 +8,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.example.kachow_cursach.data.network.KtorClient
 
 
 @Composable
 fun ZoomableImage(
-    imageRes: Int,
+    imageUrl: String,
     modifier: Modifier = Modifier,
-    resetTrigger: Int = 0
+    resetTrigger: Int = 0,
+    contentDescription: String? = null
 ) {
     var scale by remember { mutableStateOf(1f) }
     var offsetX by remember { mutableStateOf(0f) }
@@ -47,16 +51,12 @@ fun ZoomableImage(
             }
     ) {
         AsyncImage(
-            model = imageRes,
-            contentDescription = "Zoomable image",
-            modifier = Modifier
-                .fillMaxSize()
-                .graphicsLayer(
-                    scaleX = scale,
-                    scaleY = scale,
-                    translationX = offsetX,
-                    translationY = offsetY
-                ),
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(KtorClient.getFullUrl(imageUrl))
+                .crossfade(true)
+                .build(),
+            contentDescription = contentDescription ?: "Zoomable image",
+            modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Fit
         )
     }
