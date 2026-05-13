@@ -16,6 +16,8 @@ import com.example.kachow_cursach.presentation.screens.main.DealershipSelectionS
 import com.example.kachow_cursach.presentation.screens.main.MainScreen
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import com.example.kachow_cursach.presentation.components.AddCarScreen
+import com.example.kachow_cursach.presentation.components.EditCarScreen
 import com.example.kachow_cursach.presentation.screens.main.AdminPanelScreen
 
 
@@ -65,6 +67,26 @@ fun NavGraph() {
 
         composable("admin_panel") {
             AdminPanelScreen(navController)
+        }
+
+        composable(
+            "add_car/{dealershipId}",
+            arguments = listOf(navArgument("dealershipId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val dealershipId = backStackEntry.arguments?.getInt("dealershipId") ?: 1
+            AddCarScreen(navController, dealershipId)
+        }
+
+        composable(
+            "edit_car/{carId}/{dealershipId}",
+            arguments = listOf(
+                navArgument("carId") { type = NavType.IntType },
+                navArgument("dealershipId") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val carId = backStackEntry.arguments?.getInt("carId") ?: return@composable
+            val dealershipId = backStackEntry.arguments?.getInt("dealershipId") ?: return@composable
+            EditCarScreen(navController, carId, dealershipId)
         }
     }
 }

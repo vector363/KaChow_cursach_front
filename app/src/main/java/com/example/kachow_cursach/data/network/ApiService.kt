@@ -1,5 +1,7 @@
 package com.example.kachow_cursach.data.network
 
+import com.example.kachow_cursach.data.model.AddCarRequest
+import com.example.kachow_cursach.data.model.AddCarResponse
 import com.example.kachow_cursach.data.model.AuthResponse
 import com.example.kachow_cursach.data.model.CarDetailDto
 import com.example.kachow_cursach.data.model.CarDetailResponse
@@ -9,6 +11,8 @@ import com.example.kachow_cursach.data.model.DealershipDto
 import com.example.kachow_cursach.data.model.ErrorResponse
 import com.example.kachow_cursach.data.model.LoginRequest
 import com.example.kachow_cursach.data.model.RegisterRequest
+import com.example.kachow_cursach.data.model.UpdateCarRequest
+import com.example.kachow_cursach.data.model.UpdateCarResponse
 import com.example.kachow_cursach.data.network.KtorClient.BASE_URL
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -16,6 +20,7 @@ import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
@@ -106,6 +111,34 @@ class ApiService(
         println(">>> getCarDetail: calling for carId=$carId")
         return client.get("${BASE_URL}/car/$carId") {
             headers { append("Authorization", "Bearer $token") }
+        }.body()
+    }
+
+    suspend fun addCar(token: String, carData: AddCarRequest): AddCarResponse {
+        return client.post("${BASE_URL}/car/add") {
+            contentType(ContentType.Application.Json)
+            headers {
+                append("Authorization", "Bearer $token")
+            }
+            setBody(carData)
+        }.body()
+    }
+
+    suspend fun updateCar(token: String, carId: Int, carData: UpdateCarRequest): UpdateCarResponse {
+        return client.put("${BASE_URL}/car/$carId") {
+            contentType(ContentType.Application.Json)
+            headers {
+                append("Authorization", "Bearer $token")
+            }
+            setBody(carData)
+        }.body()
+    }
+
+    suspend fun getCarById(token: String, carId: Int): CarDetailResponse {
+        return client.get("${BASE_URL}/car/$carId") {
+            headers {
+                append("Authorization", "Bearer $token")
+            }
         }.body()
     }
 }

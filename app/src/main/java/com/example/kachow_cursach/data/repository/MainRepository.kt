@@ -1,12 +1,15 @@
 package com.example.kachow_cursach.data.repository
 
 import com.example.kachow_cursach.data.local.TokenManager
+import com.example.kachow_cursach.data.model.AddCarRequest
+import com.example.kachow_cursach.data.model.AddCarResponse
 import com.example.kachow_cursach.data.model.AuthResponse
-import com.example.kachow_cursach.data.model.CarDetailDto
 import com.example.kachow_cursach.data.model.CarDetailResponse
 import com.example.kachow_cursach.data.model.CarDto
 import com.example.kachow_cursach.data.model.CarImageDto
 import com.example.kachow_cursach.data.model.DealershipDto
+import com.example.kachow_cursach.data.model.UpdateCarRequest
+import com.example.kachow_cursach.data.model.UpdateCarResponse
 import com.example.kachow_cursach.data.network.ApiService
 
 
@@ -139,6 +142,95 @@ class MainRepository(
         } catch (e: Exception) {
             println(">>> [REPO] ERROR: ${e.message}")
             e.printStackTrace()
+            Result.failure(e)
+        }
+    }
+
+    suspend fun addCar(
+        brand: String,
+        model: String,
+        price: Int,
+        year: Int,
+        mileage: Int,
+        engine: String,
+        horsepower: Int,
+        transmission: String,
+        driveUnit: String,
+        color: String,
+        description: String,
+        imageUrl: String?,
+        dealershipId: Int
+    ): Result<AddCarResponse> {
+        val token = tokenManager.getToken() ?: return Result.failure(Exception("Not authenticated"))
+        return try {
+            val request = AddCarRequest(
+                brand = brand,
+                model = model,
+                price = price,
+                year = year,
+                mileage = mileage,
+                engine = engine,
+                horsepower = horsepower,
+                transmission = transmission,
+                driveUnit = driveUnit,
+                color = color,
+                description = description,
+                imageUrl = imageUrl,
+                dealershipId = dealershipId
+            )
+            val response = apiService.addCar(token, request)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updateCar(
+        carId: Int,
+        brand: String,
+        model: String,
+        price: Int,
+        year: Int,
+        mileage: Int,
+        engine: String,
+        horsepower: Int,
+        transmission: String,
+        driveUnit: String,
+        color: String,
+        description: String,
+        imageUrl: String?,
+        dealershipId: Int
+    ): Result<UpdateCarResponse> {
+        val token = tokenManager.getToken() ?: return Result.failure(Exception("Not authenticated"))
+        return try {
+            val request = UpdateCarRequest(
+                brand = brand,
+                model = model,
+                price = price,
+                year = year,
+                mileage = mileage,
+                engine = engine,
+                horsepower = horsepower,
+                transmission = transmission,
+                driveUnit = driveUnit,
+                color = color,
+                description = description,
+                imageUrl = imageUrl,
+                dealershipId = dealershipId
+            )
+            val response = apiService.updateCar(token, carId, request)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getCarById(carId: Int): Result<CarDetailResponse> {
+        val token = tokenManager.getToken() ?: return Result.failure(Exception("Not authenticated"))
+        return try {
+            val response = apiService.getCarById(token, carId)
+            Result.success(response)
+        } catch (e: Exception) {
             Result.failure(e)
         }
     }
