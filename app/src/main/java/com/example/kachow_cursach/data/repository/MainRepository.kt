@@ -17,7 +17,13 @@ class MainRepository(
     suspend fun login(email: String, password: String): Result<AuthResponse> {
         return try {
             val response = apiService.login(email, password)
-            tokenManager.saveToken(response.token)
+            tokenManager.saveAuthData(
+                token = response.token,
+                userId = response.userId,
+                username = response.username,
+                email = response.email,
+                role = response.role
+            )
             Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)
@@ -27,11 +33,25 @@ class MainRepository(
     suspend fun register(username: String, email: String, password: String): Result<AuthResponse> {
         return try {
             val response = apiService.register(username, email, password)
-            tokenManager.saveToken(response.token)
+            tokenManager.saveAuthData(
+                token = response.token,
+                userId = response.userId,
+                username = response.username,
+                email = response.email,
+                role = response.role
+            )
             Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    fun getUserRole(): String {
+        return tokenManager.getUserRole()
+    }
+
+    fun isAdmin(): Boolean {
+        return tokenManager.isAdmin()
     }
 
     fun logout() {

@@ -13,11 +13,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.kachow_cursach.R
+import com.example.kachow_cursach.di.AppModule
 import com.example.kachow_cursach.domain.model.Dealership
-
-/**
- * Основной экран приложения с BottomBar
- */
 
 
 sealed class BottomNavItem(
@@ -38,6 +35,12 @@ sealed class BottomNavItem(
         icon = R.drawable.icon_favorite_unswitch,
         selectedIcon = R.drawable.icon_favorite_switch
     )
+    object AdminPanel : BottomNavItem(
+        route = "admin_panel",
+        title = "Управление",
+        icon = R.drawable.baseline_settings_24,
+        selectedIcon = R.drawable.baseline_settings_24
+    )
     object Profile : BottomNavItem(
         route = "profile",
         title = "Профиль",
@@ -54,6 +57,22 @@ fun MainScreen(
 ) {
     var selectedItem by remember { mutableStateOf<BottomNavItem>(BottomNavItem.Catalog) }
 
+    val authViewModel = AppModule.provideAuthViewModel()
+    val isAdmin by remember { mutableStateOf(authViewModel.isAdmin()) }
+
+    val navItems = if (isAdmin) {
+        listOf(
+            BottomNavItem.Catalog,
+            BottomNavItem.AdminPanel,
+            BottomNavItem.Profile
+        )
+    } else {
+        listOf(
+            BottomNavItem.Catalog,
+            BottomNavItem.Favorites,
+            BottomNavItem.Profile
+        )
+    }
 
     Box(
         modifier = Modifier
@@ -64,6 +83,7 @@ fun MainScreen(
         when (selectedItem) {
             BottomNavItem.Catalog -> CatalogScreen(navController, dealership = dealership)
             BottomNavItem.Favorites -> FavoritesScreen(navController)
+            BottomNavItem.AdminPanel -> AdminPanelScreen(navController)
             BottomNavItem.Profile -> ProfileScreen(navController)
         }
 
@@ -94,13 +114,7 @@ fun MainScreen(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    val items = listOf(
-                        BottomNavItem.Catalog,
-                        BottomNavItem.Favorites,
-                        BottomNavItem.Profile
-                    )
-
-                    items.forEach { item ->
+                    navItems.forEach { item ->
                         val isSelected = selectedItem == item
 
                         NavigationBarItem(

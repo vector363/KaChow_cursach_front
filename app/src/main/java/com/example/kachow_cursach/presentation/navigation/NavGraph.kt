@@ -16,6 +16,7 @@ import com.example.kachow_cursach.presentation.screens.main.DealershipSelectionS
 import com.example.kachow_cursach.presentation.screens.main.MainScreen
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import com.example.kachow_cursach.presentation.screens.main.AdminPanelScreen
 
 
 @Composable
@@ -60,6 +61,10 @@ fun NavGraph() {
         ) { backStackEntry ->
             val carId = backStackEntry.arguments?.getInt("carId") ?: return@composable
             CarDetailScreen(navController, carId)
+        }
+
+        composable("admin_panel") {
+            AdminPanelScreen(navController)
         }
     }
 }
