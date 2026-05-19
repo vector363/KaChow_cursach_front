@@ -36,7 +36,10 @@ fun ZoomableImage(
             .pointerInput(Unit) {
                 detectTransformGestures { _, pan, zoom, _ ->
                     val newScale = (scale * zoom).coerceIn(1f, 5f)
-                    scale = newScale
+
+                    if (newScale != scale) {
+                        scale = newScale
+                    }
 
                     if (scale > 1f) {
                         val maxOffsetX = 500f * (scale - 1)
@@ -56,7 +59,14 @@ fun ZoomableImage(
                 .crossfade(true)
                 .build(),
             contentDescription = contentDescription ?: "Zoomable image",
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                    translationX = offsetX
+                    translationY = offsetY
+                },
             contentScale = ContentScale.Fit
         )
     }

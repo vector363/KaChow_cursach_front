@@ -26,7 +26,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.kachow_cursach.R
 import com.example.kachow_cursach.data.network.KtorClient
-import com.example.kachow_cursach.di.AppModule
+import com.example.kachow_cursach.di.getCarViewModel
 import com.example.kachow_cursach.presentation.components.FullScreenImageViewer
 import com.example.kachow_cursach.presentation.viewmodel.CarViewModel
 
@@ -35,9 +35,10 @@ import com.example.kachow_cursach.presentation.viewmodel.CarViewModel
 @Composable
 fun CarDetailScreen(
     navController: NavController,
-    carId: Int,
-    carViewModel: CarViewModel = AppModule.provideCarViewModel()
+    carId: Int
 ) {
+    val carViewModel: CarViewModel = getCarViewModel()
+
     println("CarDetailScreen запущен")
 
     var showFullScreenImage by remember { mutableStateOf(false) }
@@ -69,7 +70,6 @@ fun CarDetailScreen(
             onDismiss = { showFullScreenImage = false }
         )
     }
-
 
 
     Scaffold(
@@ -400,7 +400,6 @@ fun CarDetailScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Повреждения
                 Card(
                     modifier = Modifier
                         .height(400.dp),

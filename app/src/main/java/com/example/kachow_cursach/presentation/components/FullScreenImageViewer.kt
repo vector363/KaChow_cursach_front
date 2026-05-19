@@ -56,17 +56,11 @@ fun FullScreenImageViewer(
                 }
 
         ) {
-//            ZoomableImage(
-//                imageUrl = images[currentIndex],
-//                modifier = Modifier.fillMaxSize(),
-//                resetTrigger = resetZoomTrigger,
-//                contentDescription = "Полноэкранное фото"
-//            )
-            AsyncImage(
-                model = KtorClient.getFullUrl(images[currentIndex]),
-                contentDescription = "фото: ${currentIndex}",
+            ZoomableImage(
+                imageUrl = images[currentIndex],
                 modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
+                resetTrigger = resetZoomTrigger,
+                contentDescription = "Полноэкранное фото"
             )
 
             IconButton(
