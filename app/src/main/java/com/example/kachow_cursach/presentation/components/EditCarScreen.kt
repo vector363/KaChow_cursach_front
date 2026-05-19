@@ -66,7 +66,6 @@ fun EditCarScreen(
             driveUnit = it.driveUnit
             color = it.color
             description = it.description
-            // imageUrl пока оставляем пустым, можно доработать
         }
     }
 

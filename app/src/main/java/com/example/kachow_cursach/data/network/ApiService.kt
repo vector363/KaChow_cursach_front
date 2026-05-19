@@ -13,6 +13,7 @@ import com.example.kachow_cursach.data.model.LoginRequest
 import com.example.kachow_cursach.data.model.RegisterRequest
 import com.example.kachow_cursach.data.model.UpdateCarRequest
 import com.example.kachow_cursach.data.model.UpdateCarResponse
+import com.example.kachow_cursach.data.model.UserResponse
 import com.example.kachow_cursach.data.network.KtorClient.BASE_URL
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -141,4 +142,14 @@ class ApiService(
             }
         }.body()
     }
+
+    suspend fun getCurrentUser(token: String): UserResponse {
+        return client.get("${BASE_URL}/me") {
+            headers {
+                append("Authorization", "Bearer $token")
+            }
+        }.body()
+    }
+
+
 }

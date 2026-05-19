@@ -39,7 +39,7 @@ fun CarDetailScreen(
 ) {
     val carViewModel: CarViewModel = getCarViewModel()
 
-    println("CarDetailScreen запущен")
+    val favorites by carViewModel.favorites.collectAsState()
 
     var showFullScreenImage by remember { mutableStateOf(false) }
     var selectedImageIndex by remember { mutableStateOf(0) }
@@ -48,8 +48,14 @@ fun CarDetailScreen(
     val isLoading by carViewModel.isLoading.collectAsState()
     val error by carViewModel.error.collectAsState()
 
+
+    val isFavorite = remember(car?.id, favorites) {
+        favorites.any { it.id == car?.id }
+    }
+
     LaunchedEffect(carId) {
         carViewModel.loadCarDetail(carId)
+        carViewModel.loadFavorites()
     }
 
     val carImagesMap by carViewModel.carImages.collectAsState()
@@ -94,25 +100,28 @@ fun CarDetailScreen(
                         )
                     }
                 },
-//                actions = {
-//                    IconButton(
-//                        onClick = {
-//                            car?.let {
-//                                carViewModel.toggleFavorite(
-//                                    carId = it.id,
-//                                    isCurrentlyFavorite = it.isFavorite
-//                                )
-//                            }
-//                        }
-//                    ) {
-//                        Icon(
-//                            imageVector = if (car?.isFavorite == true) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-//                            modifier = Modifier.size(26.dp),
-//                            contentDescription = "Избранное",
-//                            tint = if (car?.isFavorite == true) Color.Red else Color.White
-//                        )
-//                    }
-//                },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            car?.let {
+                                carViewModel.toggleFavorite(
+                                    carId = it.id,
+                                    isCurrentlyFavorite = isFavorite
+                                )
+                            }
+                        }
+                    ) {
+                        Icon(
+                            painter = if (isFavorite == true)
+                                painterResource(id = R.drawable.icon_favorite_switch)
+                            else
+                                painterResource(id = R.drawable.icon_favorite_unswitch),
+                            contentDescription = "Избранное",
+                            tint = if (isFavorite == true) Color.Red else Color.White,
+                            modifier = Modifier.size(26.dp)
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
                 )

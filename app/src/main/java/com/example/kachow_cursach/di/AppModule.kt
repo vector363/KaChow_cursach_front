@@ -8,9 +8,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.kachow_cursach.data.local.TokenManager
 import com.example.kachow_cursach.data.network.ApiService
 import com.example.kachow_cursach.data.repository.MainRepository
+import com.example.kachow_cursach.di.AppModule.mainRepository
 import com.example.kachow_cursach.presentation.viewmodel.AuthViewModel
 import com.example.kachow_cursach.presentation.viewmodel.CarViewModel
 import com.example.kachow_cursach.presentation.viewmodel.DealershipViewModel
+import com.example.kachow_cursach.presentation.viewmodel.UserViewModel
 
 object AppModule {
     private lateinit var tokenManager: TokenManager
@@ -64,4 +66,25 @@ fun provideCarViewModelFactory(): ViewModelProvider.Factory {
 @Composable
 fun getCarViewModel(): CarViewModel {
     return viewModel(factory = provideCarViewModelFactory())
+}
+
+fun provideUserViewModel(): UserViewModel {
+    return UserViewModel(mainRepository)
+}
+
+class UserViewModelFactory(private val mainRepository: MainRepository) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        @Suppress("UNCHECKED_CAST")
+        return when {
+            modelClass.isAssignableFrom(UserViewModel::class.java) -> {
+                UserViewModel(mainRepository) as T
+            }
+            else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
+        }
+    }
+}
+
+@Composable
+fun getUserViewModel(): UserViewModel {
+    return viewModel(factory = UserViewModelFactory(mainRepository))
 }

@@ -6,7 +6,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -78,7 +77,6 @@ fun AddCarScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Основная информация
             Text(
                 text = "Основная информация",
                 fontSize = 20.sp,
@@ -144,7 +142,6 @@ fun AddCarScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Технические характеристики
             Text(
                 text = "Технические характеристики",
                 fontSize = 20.sp,
@@ -197,7 +194,6 @@ fun AddCarScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Описание и фото
             Text(
                 text = "Дополнительно",
                 fontSize = 20.sp,
@@ -225,7 +221,6 @@ fun AddCarScreen(
                 placeholder = { Text("https://...") }
             )
 
-            // Показываем ошибку если есть
             if (errorMessage != null) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -243,11 +238,9 @@ fun AddCarScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Кнопка добавления
             Button(
                 onClick = {
                     scope.launch {
-                        // Валидация
                         if (brand.isBlank() || model.isBlank() || price.isBlank() ||
                             year.isBlank() || mileage.isBlank() || engine.isBlank() ||
                             horsepower.isBlank() || transmission.isBlank() || driveUnit.isBlank()) {
@@ -302,7 +295,7 @@ fun AddCarScreen(
                     )
                 } else {
                     Text(
-                        text = "➕ Добавить автомобиль",
+                        text = "Добавить автомобиль",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimary
@@ -314,7 +307,6 @@ fun AddCarScreen(
         }
     }
 
-    // Диалог успеха
     if (showSuccessDialog) {
         AlertDialog(
             onDismissRequest = { showSuccessDialog = false },

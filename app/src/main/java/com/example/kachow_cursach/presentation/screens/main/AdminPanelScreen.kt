@@ -122,11 +122,10 @@ fun AdminPanelScreen(
                             navController.navigate("edit_car/${car.id}/${car.dealershipId}")
                         },
                         onFavoriteClick = {
-//                            carViewModel.toggleFavorite(car.id, true) { success ->
-//                                if (success) {
-//
-//                                }
-//                            }
+                            carViewModel.toggleFavorite(car.id, true) { success ->
+                                if (success) {
+                                }
+                            }
                         }
                     )
                 }

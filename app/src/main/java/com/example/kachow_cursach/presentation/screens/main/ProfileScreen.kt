@@ -33,7 +33,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,17 +46,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.kachow_cursach.R
+import com.example.kachow_cursach.di.getUserViewModel
+import com.example.kachow_cursach.presentation.viewmodel.UserViewModel
 
-/**
- * Экран профиля пользователя
- */
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navController: NavController) {
-    val userName = "Алексей"
-    val userEmail = "aleksey@example.com"
-    val userSince = "2024"
+    val userViewModel: UserViewModel = getUserViewModel()
+    val currentUser by userViewModel.currentUser.collectAsState()
+    val isLoading by userViewModel.isLoading.collectAsState()
+    val error by userViewModel.error.collectAsState()
+
+    LaunchedEffect(Unit) {
+        userViewModel.loadCurrentUser()
+    }
 
     Scaffold(
         topBar = {
@@ -115,14 +119,14 @@ fun ProfileScreen(navController: NavController) {
                     }
 
                     Text(
-                        text = userName,
+                        text = currentUser ?.username ?: "Пользователь",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
 
                     Text(
-                        text = userEmail,
+                        text = currentUser ?.email ?: "email@example.com",
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -135,7 +139,7 @@ fun ProfileScreen(navController: NavController) {
                         )
                     ) {
                         Text(
-                            text = "С нами с $userSince года",
+                            text = "С нами с 2026 года",
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
@@ -257,4 +261,6 @@ fun ProfileMenuItem(
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
+
 }
+

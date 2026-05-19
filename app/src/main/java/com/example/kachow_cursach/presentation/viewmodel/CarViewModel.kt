@@ -94,12 +94,20 @@ class CarViewModel(
                 onSuccess = {
                     println(">>> Toggle favorite SUCCESS for carId=$carId, wasFavorite=$isCurrentlyFavorite")
 
+                    // Обновляем список автомобилей в основном каталоге
                     val updatedCars = _cars.value.map { car ->
                         if (car.id == carId) car.copy(isFavorite = !isCurrentlyFavorite) else car
                     }
                     _cars.value = updatedCars
 
-                    if (!isCurrentlyFavorite) {
+                    // ОБНОВЛЯЕМ СПИСОК ИЗБРАННОГО - просто фильтруем
+                    if (isCurrentlyFavorite) {
+                        // Удаляем из избранного
+                        val newFavorites = _favorites.value.filter { it.id != carId }
+                        _favorites.value = newFavorites
+                        println(">>> Removed from favorites, new size: ${newFavorites.size}")
+                    } else {
+                        // Добавляем в избранное
                         val carToAdd = updatedCars.find { it.id == carId }
                         if (carToAdd != null) {
                             val newFavorites = _favorites.value + carToAdd.copy(isFavorite = true)
@@ -108,10 +116,6 @@ class CarViewModel(
                         } else {
                             loadFavorites()
                         }
-                    } else {
-                        val newFavorites = _favorites.value.filter { it.id != carId }
-                        _favorites.value = newFavorites
-                        println(">>> Removed from favorites, new size: ${newFavorites.size}")
                     }
 
                     onComplete(true)
@@ -174,9 +178,6 @@ class CarViewModel(
         }
     }
 
-    fun clearError() {
-        _error.value = null
-    }
 
     suspend fun addCar(
         brand: String,

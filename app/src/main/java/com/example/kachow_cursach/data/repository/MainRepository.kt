@@ -10,6 +10,7 @@ import com.example.kachow_cursach.data.model.CarImageDto
 import com.example.kachow_cursach.data.model.DealershipDto
 import com.example.kachow_cursach.data.model.UpdateCarRequest
 import com.example.kachow_cursach.data.model.UpdateCarResponse
+import com.example.kachow_cursach.data.model.User
 import com.example.kachow_cursach.data.network.ApiService
 
 
@@ -233,5 +234,32 @@ class MainRepository(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    suspend fun getCurrentUser(): Result<User> {
+        val token = tokenManager.getToken() ?: return Result.failure(Exception("Not authenticated"))
+        return try {
+            val userResponse = apiService.getCurrentUser(token)
+            println(">>> [REPO] SUCCESS: ${userResponse}")
+            if (userResponse.userId != null) {
+                Result.success(
+                    User(
+                        id = userResponse.userId,
+                        username = userResponse.username ?: "Пользователь",
+                        email = userResponse.email,
+                        role = userResponse.role ?: "user",
+                        createdAt = userResponse.createdAt
+                    )
+                )
+            } else {
+                Result.failure(Exception("Не удалось получить данные пользователя"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    fun clearToken() {
+        tokenManager.clearToken()
     }
 }

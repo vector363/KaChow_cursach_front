@@ -44,13 +44,6 @@ fun FavoritesScreen(
     val isLoading by carViewModel.isLoading.collectAsState()
     val error by carViewModel.error.collectAsState()
 
-    LaunchedEffect(favorites) {
-        println(">>> [FavoritesScreen] Favorites updated: ${favorites.size} cars")
-        favorites.forEach { car ->
-            println(">>> [FavoritesScreen] Car: ${car.brand} ${car.model}, price=${car.price}")
-        }
-    }
-
     LaunchedEffect(Unit) {
         println(">>> [FavoritesScreen] Loading favorites")
         carViewModel.loadFavorites()
@@ -118,7 +111,6 @@ fun FavoritesScreen(
                         onFavoriteClick = {
                             carViewModel.toggleFavorite(car.id, true) { success ->
                                 if (success) {
-
                                 }
                             }
                         }
