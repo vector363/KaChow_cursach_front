@@ -41,16 +41,19 @@ class CarViewModel(
     val carImages: StateFlow<Map<Int, List<CarImageDto>>> = _carImages.asStateFlow()
 
     fun loadCars(dealershipId: Int) {
+        println(">>> loadCars called with dealershipId=$dealershipId")
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
             val result = repository.getCarsByDealership(dealershipId)
             result.fold(
                 onSuccess = { cars ->
+                    println(">>> loadCars success: ${cars.size} cars loaded")
                     _cars.value = cars
                     updateFavoriteStatus(cars)
                 },
                 onFailure = {
+                    println(">>> loadCars error: ${it.message}")
                     _error.value = it.message
                 }
             )
@@ -67,9 +70,7 @@ class CarViewModel(
                 if (result.isSuccess) {
                     val favoritesList = result.getOrNull() ?: emptyList()
                     _favorites.value = favoritesList
-                    println("Favorites loaded: ${favoritesList.size} cars")
                     favoritesList.forEach { car ->
-                        println("Favorite car: ${car.brand} ${car.model}, price=${car.price}, year=${car.year}")
                         loadCarImages(car.id)
                     }
                 } else {
@@ -92,27 +93,19 @@ class CarViewModel(
 
             result.fold(
                 onSuccess = {
-                    println(">>> Toggle favorite SUCCESS for carId=$carId, wasFavorite=$isCurrentlyFavorite")
-
-                    // Обновляем список автомобилей в основном каталоге
                     val updatedCars = _cars.value.map { car ->
                         if (car.id == carId) car.copy(isFavorite = !isCurrentlyFavorite) else car
                     }
                     _cars.value = updatedCars
 
-                    // ОБНОВЛЯЕМ СПИСОК ИЗБРАННОГО - просто фильтруем
                     if (isCurrentlyFavorite) {
-                        // Удаляем из избранного
                         val newFavorites = _favorites.value.filter { it.id != carId }
                         _favorites.value = newFavorites
-                        println(">>> Removed from favorites, new size: ${newFavorites.size}")
                     } else {
-                        // Добавляем в избранное
                         val carToAdd = updatedCars.find { it.id == carId }
                         if (carToAdd != null) {
                             val newFavorites = _favorites.value + carToAdd.copy(isFavorite = true)
                             _favorites.value = newFavorites
-                            println(">>> Added to favorites, new size: ${newFavorites.size}")
                         } else {
                             loadFavorites()
                         }
@@ -121,7 +114,6 @@ class CarViewModel(
                     onComplete(true)
                 },
                 onFailure = { error ->
-                    println("Toggle favorite FAILED: ${error.message}")
                     onComplete(false)
                 }
             )

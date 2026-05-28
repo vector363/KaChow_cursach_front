@@ -1,7 +1,6 @@
 package com.example.kachow_cursach.presentation.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.navigation.NavType
@@ -26,25 +25,13 @@ import com.example.kachow_cursach.di.AppModule
 @Composable
 fun NavGraph() {
     val navController = rememberNavController()
-
     var selectedDealership by remember { mutableStateOf<Dealership?>(null) }
-
     val tokenManager = AppModule.getTokenManager()
-    var isAuthenticated by remember { mutableStateOf<Boolean?>(null) }
-
-    LaunchedEffect(Unit) {
-        isAuthenticated = tokenManager.isLoggedIn()
-    }
-
-    val startDestination = when (isAuthenticated) {
-        true -> "dealership_selection"
-        else -> "login"
-    }
 
 
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = if (tokenManager.isLoggedIn()) "dealership_selection" else "login"
         ) {
 
         composable("dealership_selection") {

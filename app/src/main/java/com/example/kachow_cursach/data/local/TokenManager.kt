@@ -59,11 +59,4 @@ class TokenManager(context: Context) {
         return getUserRole() == "admin"
     }
 
-    fun isSessionValid(): Boolean {
-        val loginTimestamp = prefs.getLong("loginTimestamp", 0)
-        val currentTime = System.currentTimeMillis()
-        val thirtyDaysInMillis = 30L * 24 * 60 * 60 * 1000
-        return isLoggedIn() && (currentTime - loginTimestamp < thirtyDaysInMillis)
-    }
-
 }

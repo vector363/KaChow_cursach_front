@@ -3,7 +3,6 @@ package com.example.kachow_cursach.data.network
 import com.example.kachow_cursach.data.model.AddCarRequest
 import com.example.kachow_cursach.data.model.AddCarResponse
 import com.example.kachow_cursach.data.model.AuthResponse
-import com.example.kachow_cursach.data.model.CarDetailDto
 import com.example.kachow_cursach.data.model.CarDetailResponse
 import com.example.kachow_cursach.data.model.CarDto
 import com.example.kachow_cursach.data.model.CarImageDto

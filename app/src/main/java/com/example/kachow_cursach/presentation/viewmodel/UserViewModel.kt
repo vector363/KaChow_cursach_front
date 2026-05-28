@@ -31,11 +31,9 @@ class UserViewModel(
             result.fold(
                 onSuccess = { user ->
                     _currentUser.value = user
-                    println("User loaded: ${user.username}, role: ${user.role}")
                 },
                 onFailure = { error ->
                     _error.value = error.message
-                    println("Error loading user: ${error.message}")
                 }
             )
 
@@ -46,9 +44,5 @@ class UserViewModel(
     fun logout() {
         repository.logout()
         _currentUser.value = null
-    }
-
-    fun clearError() {
-        _error.value = null
     }
 }

@@ -181,15 +181,6 @@ fun ProfileScreen(navController: NavController) {
                         )
                         ProfileMenuItem(
                             icon = Icons.Default.Info,
-                            title = "Помощь",
-                            onClick = { }
-                        )
-                        Divider(
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                        )
-                        ProfileMenuItem(
-                            icon = Icons.Default.Info,
                             title = "О приложении",
                             onClick = { }
                         )
@@ -269,6 +260,5 @@ fun ProfileMenuItem(
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
-
 }
 

@@ -124,21 +124,14 @@ class MainRepository(
 
     suspend fun getCarDetail(carId: Int): Result<CarDetailResponse> {
         val token = tokenManager.getToken()
-        println(">>> [REPO] getCarDetail START for carId=$carId")
-        println(">>> [REPO] Token exists: ${token != null}")
-
         if (token == null) {
-            println(">>> [REPO] ERROR: No token found")
             return Result.failure(Exception("Not authenticated"))
         }
 
         return try {
-            println(">>> [REPO] Calling apiService.getCarDetail...")
             val response = apiService.getCarDetail(token, carId)
-            println(">>> [REPO] SUCCESS: ${response.brand} ${response.model}")
             Result.success(response)
         } catch (e: Exception) {
-            println(">>> [REPO] ERROR: ${e.message}")
             e.printStackTrace()
             Result.failure(e)
         }
@@ -254,10 +247,6 @@ class MainRepository(
         } catch (e: Exception) {
             Result.failure(e)
         }
-    }
-
-    fun clearToken() {
-        tokenManager.clearToken()
     }
 
     fun logout() {
