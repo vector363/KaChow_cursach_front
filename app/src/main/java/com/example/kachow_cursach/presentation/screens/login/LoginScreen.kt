@@ -40,6 +40,7 @@ import com.example.kachow_cursach.presentation.viewmodel.AuthViewModel
 @Composable
 fun LoginScreen(
     navController: NavController,
+    onLoginSuccess: () -> Unit = {},
     authViewModel: AuthViewModel = AppModule.provideAuthViewModel()){
 
     var email by remember { mutableStateOf("") }
@@ -204,7 +205,7 @@ fun LoginScreen(
                                 password = password,
                                 onSuccess = {
                                     showError = false
-                                    navController.navigate("dealership_selection")
+                                    onLoginSuccess()
                                 },
                                 onError = { errorMessage ->
                                     showError = true

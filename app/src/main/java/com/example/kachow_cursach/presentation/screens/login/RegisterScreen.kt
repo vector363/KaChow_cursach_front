@@ -41,6 +41,7 @@ import com.example.kachow_cursach.presentation.viewmodel.AuthViewModel
 @Composable
 fun RegisterScreen(
     navController: NavController,
+    onRegisterSuccess: () -> Unit = {},
     authViewModel: AuthViewModel = AppModule.provideAuthViewModel()){
 
     var passwordVisible by remember { mutableStateOf(false) }
@@ -369,8 +370,7 @@ fun RegisterScreen(
                         isSuccess = true,
                         onDismiss = {
                             showSuccessDialog = false
-
-                            navController.navigate("dealership_selection")
+                            onRegisterSuccess()
                         }
                     )
                 }

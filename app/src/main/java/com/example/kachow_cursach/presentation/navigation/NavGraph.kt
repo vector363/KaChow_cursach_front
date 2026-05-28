@@ -1,6 +1,7 @@
 package com.example.kachow_cursach.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.navigation.NavType
@@ -19,6 +20,7 @@ import androidx.compose.runtime.setValue
 import com.example.kachow_cursach.presentation.components.AddCarScreen
 import com.example.kachow_cursach.presentation.components.EditCarScreen
 import com.example.kachow_cursach.presentation.screens.main.AdminPanelScreen
+import com.example.kachow_cursach.di.AppModule
 
 
 @Composable
@@ -27,10 +29,22 @@ fun NavGraph() {
 
     var selectedDealership by remember { mutableStateOf<Dealership?>(null) }
 
+    val tokenManager = AppModule.getTokenManager()
+    var isAuthenticated by remember { mutableStateOf<Boolean?>(null) }
+
+    LaunchedEffect(Unit) {
+        isAuthenticated = tokenManager.isLoggedIn()
+    }
+
+    val startDestination = when (isAuthenticated) {
+        true -> "dealership_selection"
+        else -> "login"
+    }
+
 
     NavHost(
         navController = navController,
-        startDestination = "login"
+        startDestination = startDestination
         ) {
 
         composable("dealership_selection") {
@@ -46,8 +60,16 @@ fun NavGraph() {
         }
 
         composable("login") {
-            LoginScreen(navController)
+            LoginScreen(
+                navController = navController,
+                onLoginSuccess = {
+                    navController.navigate("dealership_selection") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                }
+            )
         }
+
         composable("register") {
             RegisterScreen(navController)
         }

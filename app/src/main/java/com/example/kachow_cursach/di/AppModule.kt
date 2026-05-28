@@ -14,6 +14,7 @@ import com.example.kachow_cursach.presentation.viewmodel.CarViewModel
 import com.example.kachow_cursach.presentation.viewmodel.DealershipViewModel
 import com.example.kachow_cursach.presentation.viewmodel.UserViewModel
 
+
 object AppModule {
     private lateinit var tokenManager: TokenManager
     lateinit var mainRepository: MainRepository
@@ -23,6 +24,10 @@ object AppModule {
         tokenManager = TokenManager(context)
         apiService = ApiService()
         mainRepository = MainRepository(apiService, tokenManager)
+    }
+
+    fun getTokenManager(): TokenManager {
+        return tokenManager
     }
 
     fun provideAuthViewModel(): AuthViewModel {

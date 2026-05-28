@@ -58,9 +58,6 @@ class MainRepository(
         return tokenManager.isAdmin()
     }
 
-    fun logout() {
-        tokenManager.clearToken()
-    }
 
     suspend fun getDealerships(): Result<List<DealershipDto>>{
         val token = tokenManager.getToken() ?: return Result.failure(Exception("Not authenticated"))
@@ -261,5 +258,9 @@ class MainRepository(
 
     fun clearToken() {
         tokenManager.clearToken()
+    }
+
+    fun logout() {
+        tokenManager.clearAuth()
     }
 }

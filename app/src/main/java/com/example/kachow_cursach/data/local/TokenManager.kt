@@ -42,12 +42,28 @@ class TokenManager(context: Context) {
         prefs.edit().clear().apply()
     }
 
+    fun clearAuth() {
+        prefs.edit().apply {
+            remove("token")
+            remove("isLoggedIn")
+            remove("loginTimestamp")
+            apply()
+        }
+    }
+
     fun isLoggedIn(): Boolean {
         return getToken() != null
     }
 
     fun isAdmin(): Boolean {
         return getUserRole() == "admin"
+    }
+
+    fun isSessionValid(): Boolean {
+        val loginTimestamp = prefs.getLong("loginTimestamp", 0)
+        val currentTime = System.currentTimeMillis()
+        val thirtyDaysInMillis = 30L * 24 * 60 * 60 * 1000
+        return isLoggedIn() && (currentTime - loginTimestamp < thirtyDaysInMillis)
     }
 
 }

@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.kachow_cursach.R
+import com.example.kachow_cursach.di.AppModule
 import com.example.kachow_cursach.di.getUserViewModel
 import com.example.kachow_cursach.presentation.viewmodel.UserViewModel
 
@@ -204,7 +205,14 @@ fun ProfileScreen(navController: NavController) {
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Button(
-                        onClick = { navController.navigate("login") },
+                        onClick = {
+                            userViewModel.logout()
+                            AppModule.getTokenManager().clearToken()
+                            navController.navigate("login") {
+                                popUpTo("main") { inclusive = true }
+                                popUpTo("profile") { inclusive = true }
+                            }
+                        },
                         modifier = Modifier
                             .width(300.dp)
                             .height(53.dp),
