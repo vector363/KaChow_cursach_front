@@ -139,14 +139,13 @@ fun DealershipCard(
             ) {
                 if (dealership.imageUrl != null) {
                     val fullUrl = KtorClient.getFullUrl(dealership.imageUrl ?: "")
-                    println(">>> Loading image from: $fullUrl")
 
                     AsyncImage(
                         model = fullUrl,
                         contentDescription = "Фото салона ${dealership.name}",
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        error = painterResource(R.drawable.dealership_preview)
+                        error = painterResource(R.drawable.background)
                     )
                 } else {
                     Box(

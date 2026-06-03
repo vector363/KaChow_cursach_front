@@ -12,5 +12,10 @@ data class CarDto(
     val year: Int? = null,
     val mileage: Int? = null,
     val imageUrl: String? = null,
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
+
+
+    val horsepower: Int? = null,
+    val transmission: String? = null,
+    val driveUnit: String? = null
 )
