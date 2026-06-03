@@ -18,24 +18,12 @@ class TokenManager(context: Context) {
         }
     }
 
-    fun saveToken(token: String) {
-        prefs.edit().putString("token", token).apply()
-    }
-
     fun getToken(): String? {
         return prefs.getString("token", null)
     }
 
-    fun getUserId(): Int {
-        return prefs.getInt("userId", -1)
-    }
-
     fun getUserRole(): String {
         return prefs.getString("role", "user") ?: "user"
-    }
-
-    fun getUsername(): String {
-        return prefs.getString("username", "") ?: ""
     }
 
     fun clearToken() {

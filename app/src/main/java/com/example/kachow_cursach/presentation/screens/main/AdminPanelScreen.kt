@@ -42,9 +42,6 @@ fun AdminPanelScreen(
 ) {
     val favorites by carViewModel.favorites.collectAsState()
     val carImages by carViewModel.carImages.collectAsState()
-    val isLoading by carViewModel.isLoading.collectAsState()
-    val error by carViewModel.error.collectAsState()
-
 
     LaunchedEffect(Unit) {
         carViewModel.loadFavorites()

@@ -56,8 +56,6 @@ import com.example.kachow_cursach.presentation.viewmodel.UserViewModel
 fun ProfileScreen(navController: NavController) {
     val userViewModel: UserViewModel = getUserViewModel()
     val currentUser by userViewModel.currentUser.collectAsState()
-    val isLoading by userViewModel.isLoading.collectAsState()
-    val error by userViewModel.error.collectAsState()
 
     LaunchedEffect(Unit) {
         userViewModel.loadCurrentUser()

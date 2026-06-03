@@ -41,11 +41,8 @@ fun FavoritesScreen(
 ) {
     val favorites by carViewModel.favorites.collectAsState()
     val carImages by carViewModel.carImages.collectAsState()
-    val isLoading by carViewModel.isLoading.collectAsState()
-    val error by carViewModel.error.collectAsState()
 
     LaunchedEffect(Unit) {
-        println(">>> [FavoritesScreen] Loading favorites")
         carViewModel.loadFavorites()
     }
 

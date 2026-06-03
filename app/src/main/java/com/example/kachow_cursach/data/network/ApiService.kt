@@ -108,7 +108,6 @@ class ApiService(
     }
 
     suspend fun getCarDetail(token: String, carId: Int): CarDetailResponse {
-        println(">>> getCarDetail: calling for carId=$carId")
         return client.get("${BASE_URL}/car/$carId") {
             headers { append("Authorization", "Bearer $token") }
         }.body()

@@ -31,10 +31,6 @@ fun FullScreenImageViewer(
     var currentIndex by remember { mutableStateOf(initialIndex) }
     var resetZoomTrigger by remember { mutableStateOf(0) }
 
-    println("экран просмотра фото запущен!")
-
-    println("фото: ${KtorClient.getFullUrl(images[currentIndex])}")
-
 
     Dialog(
         onDismissRequest = onDismiss,

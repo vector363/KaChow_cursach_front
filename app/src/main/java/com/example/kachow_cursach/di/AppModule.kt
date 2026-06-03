@@ -41,6 +41,7 @@ object AppModule {
     fun provideDealershipViewModel(): DealershipViewModel {
         return DealershipViewModel(mainRepository)
     }
+
 }
 
 class CarViewModelFactory(
@@ -58,6 +59,9 @@ class CarViewModelFactory(
             modelClass.isAssignableFrom(DealershipViewModel::class.java) -> {
                 DealershipViewModel(mainRepository) as T
             }
+            modelClass.isAssignableFrom(UserViewModel::class.java) -> {
+                UserViewModel(mainRepository) as T
+            }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }
     }
@@ -73,23 +77,8 @@ fun getCarViewModel(): CarViewModel {
     return viewModel(factory = provideCarViewModelFactory())
 }
 
-fun provideUserViewModel(): UserViewModel {
-    return UserViewModel(mainRepository)
-}
-
-class UserViewModelFactory(private val mainRepository: MainRepository) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        @Suppress("UNCHECKED_CAST")
-        return when {
-            modelClass.isAssignableFrom(UserViewModel::class.java) -> {
-                UserViewModel(mainRepository) as T
-            }
-            else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
-        }
-    }
-}
-
 @Composable
 fun getUserViewModel(): UserViewModel {
-    return viewModel(factory = UserViewModelFactory(mainRepository))
+    return viewModel(factory = CarViewModelFactory(mainRepository))
 }
+

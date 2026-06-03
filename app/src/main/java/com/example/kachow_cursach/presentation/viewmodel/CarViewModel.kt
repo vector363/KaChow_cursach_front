@@ -19,9 +19,6 @@ class CarViewModel(
     private val repository: MainRepository
 ) : ViewModel() {
 
-    private val _carImagesMap = MutableStateFlow<Map<Int, List<CarImageDto>>>(emptyMap())
-    val carImagesMap: StateFlow<Map<Int, List<CarImageDto>>> = _carImagesMap.asStateFlow()
-
     private val _carDetail = MutableStateFlow<CarDetailResponse?>(null)
     val carDetail: StateFlow<CarDetailResponse?> = _carDetail.asStateFlow()
 
@@ -41,19 +38,16 @@ class CarViewModel(
     val carImages: StateFlow<Map<Int, List<CarImageDto>>> = _carImages.asStateFlow()
 
     fun loadCars(dealershipId: Int) {
-        println(">>> loadCars called with dealershipId=$dealershipId")
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
             val result = repository.getCarsByDealership(dealershipId)
             result.fold(
                 onSuccess = { cars ->
-                    println(">>> loadCars success: ${cars.size} cars loaded")
                     _cars.value = cars
                     updateFavoriteStatus(cars)
                 },
                 onFailure = {
-                    println(">>> loadCars error: ${it.message}")
                     _error.value = it.message
                 }
             )
@@ -122,17 +116,13 @@ class CarViewModel(
 
 
     private suspend fun updateFavoriteStatus(cars: List<CarDto>) {
-        try {
-            val favoritesResult = repository.getFavorites()
-            if (favoritesResult.isSuccess) {
-                val favoriteIds = favoritesResult.getOrNull()?.map { it.id } ?: emptyList()
-                val updatedCars = cars.map { car ->
-                    car.copy(isFavorite = favoriteIds.contains(car.id))
-                }
-                _cars.value = updatedCars
+        val favoritesResult = repository.getFavorites()
+        if (favoritesResult.isSuccess) {
+            val favoriteIds = favoritesResult.getOrNull()?.map { it.id } ?: emptyList()
+            val updatedCars = cars.map { car ->
+                car.copy(isFavorite = favoriteIds.contains(car.id))
             }
-        } catch (e: Exception) {
-            println("Error updating favorite status: ${e.message}")
+            _cars.value = updatedCars
         }
     }
 
@@ -143,9 +133,7 @@ class CarViewModel(
                 _carImages.update { currentMap ->
                     currentMap + (carId to images)
                 }
-                println("Loaded ${images.size} images for car $carId")
             }.onFailure { error ->
-                println("Failed to load images for car $carId: ${error.message}")
             }
         }
     }
@@ -165,7 +153,6 @@ class CarViewModel(
                     _error.value = error.message
                 }
             )
-
             _isLoading.value = false
         }
     }
@@ -257,10 +244,6 @@ class CarViewModel(
             imageUrl = imageUrl,
             dealershipId = dealershipId
         )
-    }
-
-    fun clearEditingCar() {
-        _editingCar.value = null
     }
 }
 

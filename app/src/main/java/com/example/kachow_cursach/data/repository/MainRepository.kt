@@ -50,14 +50,9 @@ class MainRepository(
         }
     }
 
-    fun getUserRole(): String {
-        return tokenManager.getUserRole()
-    }
-
     fun isAdmin(): Boolean {
         return tokenManager.isAdmin()
     }
-
 
     suspend fun getDealerships(): Result<List<DealershipDto>>{
         val token = tokenManager.getToken() ?: return Result.failure(Exception("Not authenticated"))
@@ -230,7 +225,6 @@ class MainRepository(
         val token = tokenManager.getToken() ?: return Result.failure(Exception("Not authenticated"))
         return try {
             val userResponse = apiService.getCurrentUser(token)
-            println(">>> [REPO] SUCCESS: ${userResponse}")
             if (userResponse.userId != null) {
                 Result.success(
                     User(

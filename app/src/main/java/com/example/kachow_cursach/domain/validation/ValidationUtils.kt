@@ -2,9 +2,6 @@ package com.example.kachow_cursach.domain.validation
 
 import java.util.regex.Pattern
 
-/**
- * Объект для валидации вводим значений полльзователем на экране логина и регистрации
-*/
 
 object ValidationUtils {
 
@@ -23,19 +20,4 @@ object ValidationUtils {
     fun doPasswordsMatch(password: String, repeatPassword: String): Boolean {
         return password == repeatPassword
     }
-
-
-//    fun getPasswordStrength(password: String): PasswordStrength {
-//        return when {
-//            password.length < 6 -> PasswordStrength.WEAK
-//            password.length >= 8 && password.any { it.isDigit() } &&
-//                    password.any { it.isLetter() } -> PasswordStrength.STRONG
-//            password.length >= 6 -> PasswordStrength.MEDIUM
-//            else -> PasswordStrength.WEAK
-//        }
-//    }
 }
-
-//enum class PasswordStrength {
-//    WEAK, MEDIUM, STRONG
-//}

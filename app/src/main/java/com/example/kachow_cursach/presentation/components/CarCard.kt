@@ -1,6 +1,5 @@
 package com.example.kachow_cursach.presentation.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*

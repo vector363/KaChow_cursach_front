@@ -36,10 +36,4 @@ class AuthViewModel(
     fun isAdmin(): Boolean {
         return repository.isAdmin()
     }
-
-    fun getUserRole(): String {
-        return repository.getUserRole()
-    }
-
-
 }

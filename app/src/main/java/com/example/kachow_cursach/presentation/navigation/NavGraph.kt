@@ -86,8 +86,7 @@ fun NavGraph() {
             AddCarScreen(navController, dealershipId)
         }
 
-        composable(
-            "edit_car/{carId}/{dealershipId}",
+        composable("edit_car/{carId}/{dealershipId}",
             arguments = listOf(
                 navArgument("carId") { type = NavType.IntType },
                 navArgument("dealershipId") { type = NavType.IntType }

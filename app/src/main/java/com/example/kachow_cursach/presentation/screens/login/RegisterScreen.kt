@@ -52,6 +52,7 @@ fun RegisterScreen(
     var repeatPassword by remember { mutableStateOf("") }
 
     var showError by remember { mutableStateOf(false) }
+    val isUsernameValid = username.isNotBlank()
     val isEmailValid = ValidationUtils.isValidEmail(email)
     val isPasswordValid = ValidationUtils.isValidPassword(password)
     val doPasswordsMatch = ValidationUtils.doPasswordsMatch(password, repeatPassword)
@@ -101,7 +102,10 @@ fun RegisterScreen(
 
                 TextField(
                     value = username,
-                    onValueChange = {username = it},
+                    onValueChange = {
+                        username = it
+                        showError = false
+                    },
                     label = { Text("Введите имя пользователя") },
                     textStyle = LocalTextStyle.current.copy(
                         fontSize = 18.sp,
@@ -112,7 +116,7 @@ fun RegisterScreen(
                         .fillMaxWidth(),
                     colors = TextFieldDefaults.colors(
                         focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                        unfocusedIndicatorColor = if (username.isNotEmpty() && !isEmailValid)
+                        unfocusedIndicatorColor = if (username.isNotEmpty() && !isUsernameValid)
                             MaterialTheme.colorScheme.error
                         else
                             MaterialTheme.colorScheme.primary,
@@ -122,17 +126,17 @@ fun RegisterScreen(
                         focusedTextColor = MaterialTheme.colorScheme.onSurface,
                         unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         focusedLabelColor = MaterialTheme.colorScheme.primary,
-                        unfocusedLabelColor = if (email.isNotEmpty() && !isEmailValid)
+                        unfocusedLabelColor = if (username.isNotEmpty() && !isUsernameValid)
                             MaterialTheme.colorScheme.error
                         else
                             MaterialTheme.colorScheme.onSurfaceVariant
                     ),
                     singleLine = true,
-                    isError = email.isNotEmpty() && !isEmailValid,
+                    isError = username.isNotEmpty() && !isUsernameValid,
                     supportingText = {
-                        if (email.isNotEmpty() && !isEmailValid) {
+                        if (username.isNotEmpty() && !isUsernameValid) {
                             Text(
-                                text = "Имя пользователя занято",
+                                text = "Введите имя пользователя",
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.error
                             )
@@ -370,6 +374,10 @@ fun RegisterScreen(
                         isSuccess = true,
                         onDismiss = {
                             showSuccessDialog = false
+                            navController.navigate("dealership_selection") {
+                                popUpTo("register") { inclusive = true }
+                                popUpTo("login") { inclusive = true }
+                            }
                             onRegisterSuccess()
                         }
                     )

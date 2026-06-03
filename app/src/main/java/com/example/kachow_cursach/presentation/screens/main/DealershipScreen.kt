@@ -206,7 +206,7 @@ fun DealershipCard(
                     ) {
                         Text(
                             modifier = Modifier.padding(8.dp),
-                            text = "рейтинг ⭐ ${dealership.rating}",
+                            text = "рейтинг: ${dealership.rating}",
                             fontSize = 14.sp,
                             color = MaterialTheme.colorScheme.onSurface
                         )

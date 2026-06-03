@@ -298,9 +298,6 @@ fun CatalogScreen(
                                                     car.id,
                                                     car.isFavorite
                                                 ) { success ->
-                                                    if (success) {
-                                                        dealership?.let { carViewModel.loadCars(it.id) }
-                                                    }
                                                 }
                                             }
                                         )
